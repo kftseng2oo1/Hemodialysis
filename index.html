@@ -85,6 +85,7 @@
   .tag{font-size:15px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:1px 8px;margin-left:4px}
   .del{min-width:44px;min-height:44px;border:0;border-radius:12px;background:rgba(0,0,0,.06);font-size:18px;color:var(--muted)}
   .btnrow{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
+  .sel-in{font:inherit;font-size:20px;flex:1;min-width:0;min-height:48px;padding:6px 10px;border:2px solid var(--line);border-radius:12px;background:#fff}
   .reading{background:#fff5d6;border-radius:8px;outline:3px solid #f2b705;outline-offset:2px}
   .speak{float:right;min-height:44px;font-size:16px;padding:4px 12px;border-radius:12px;border:1px solid var(--line);background:#fff;color:var(--teal);font-weight:700}
 
@@ -143,6 +144,15 @@
       <button class="unit" data-go="exercise"><span class="emo">🚶</span><b>運動</b><span>跟著做＋計時</span></button>
       <button class="unit" data-go="cramp"><span class="emo">🦵</span><b>肌肉抽搐</b><span>為什麼會抽筋、怎麼辦</span></button>
       <button class="unit" data-go="cardio" style="grid-column:1/-1"><span class="emo">❤️</span><b>預防心臟血管疾病</b><span>六件生活中做得到的事</span></button>
+    </div>
+    <div class="card" style="margin-top:14px">
+      <h2>🔊 朗讀聲音</h2>
+      <label class="row"><span>人聲</span><select id="voiceSel" class="sel-in"></select></label>
+      <label class="row" style="margin-bottom:0"><span>速度</span><span class="muted" style="min-width:0;font-weight:400">慢</span>
+        <input type="range" id="rateSel" min="0.6" max="1.1" step="0.05" value="0.85" style="flex:1;width:auto">
+        <span class="muted" style="min-width:0;font-weight:400">快</span></label>
+      <button class="btn primary" id="voiceTest" style="width:100%;margin-top:6px">▶ 試聽</button>
+      <p class="muted" id="voiceHint" style="font-size:16px;margin-bottom:0">想要更多、更自然的聲音：iPhone 到「設定 → 輔助使用 → 朗讀內容 → 聲音 → 中文」下載，回到這裡就能選。</p>
     </div>
   </section>
 
@@ -560,13 +570,48 @@ function renderQuiz(key){
 /* 語音：先用系統 zh-TW 語音，之後可換 tts-studio 預錄 mp3 */
 /* 朗讀：清單逐點唸「第1點、第2點…」，每點分開念並高亮，點與點之間自然停頓 */
 let speakBtn = null;
-function zhVoice(){ return speechSynthesis.getVoices().find(v=>/zh[-_]TW/i.test(v.lang)); }
+const VOICE_KEY = 'hemodialysis.voice';
+let voicePref = (() => { try { return JSON.parse(localStorage.getItem(VOICE_KEY)) || {}; } catch(e){ return {}; } })();
+const REGION = { TW: '台灣', CN: '中國', HK: '香港', MO: '澳門', SG: '新加坡' };
+function zhVoices(){
+  if (!('speechSynthesis' in window)) return [];
+  const rank = v => /TW/i.test(v.lang) ? 0 : /HK|yue/i.test(v.lang) ? 2 : 1;
+  return speechSynthesis.getVoices().filter(v => /^(zh|yue|cmn)/i.test(v.lang))
+    .sort((a, b) => rank(a) - rank(b) || a.name.localeCompare(b.name));
+}
+function zhVoice(){
+  const list = zhVoices();
+  return list.find(v => v.voiceURI === voicePref.uri) || list.find(v => /zh[-_]TW/i.test(v.lang)) || list[0];
+}
 function utter(text){
   const u = new SpeechSynthesisUtterance(text);
-  u.lang = 'zh-TW'; u.rate = 0.85;
-  const v = zhVoice(); if (v) u.voice = v;
+  const v = zhVoice();
+  u.lang = v?.lang || 'zh-TW'; try { if (v) u.voice = v; } catch(e){}
+  u.rate = voicePref.rate || 0.85;
   return u;
 }
+function fillVoices(){
+  const sel = $('#voiceSel'); if (!sel) return;
+  const list = zhVoices();
+  if (!list.length){ sel.innerHTML = '<option>（系統預設）</option>'; return; }
+  const cur = zhVoice();
+  sel.innerHTML = list.map((v, i) => {
+    const m = v.lang.match(/[-_]([A-Z]{2})/i), region = m ? (REGION[m[1].toUpperCase()] || m[1]) : '';
+    const q = /premium/i.test(v.name) ? '・頂級' : /enhanced/i.test(v.name) ? '・高品質' : '';
+    const name = v.name.replace(/\s*\(.*?\)\s*/g, ' ').trim() + q;
+    return `<option value="${i}"${v === cur ? ' selected' : ''}>${name}${region ? '（' + region + '）' : ''}</option>`;
+  }).join('');
+}
+function saveVoice(){ try { localStorage.setItem(VOICE_KEY, JSON.stringify(voicePref)); } catch(e){} }
+if ('speechSynthesis' in window){
+  fillVoices();
+  speechSynthesis.addEventListener?.('voiceschanged', fillVoices);
+  setTimeout(fillVoices, 500);
+}
+$('#voiceSel').addEventListener('change', e => { const v = zhVoices()[+e.target.value]; if (v){ voicePref.uri = v.voiceURI; saveVoice(); speak('您好，我是' + v.name.split(/[\s(（]/)[0] + '，我來唸給您聽。'); } });
+$('#rateSel').value = voicePref.rate || 0.85;
+$('#rateSel').addEventListener('change', e => { voicePref.rate = +e.target.value; saveVoice(); speak('這是現在的說話速度。'); });
+$('#voiceTest').addEventListener('click', () => speak('您好，兩次透析之間，體重增加要控制在乾體重的百分之三到五以內。'));
 function stopSpeak(){
   if ('speechSynthesis' in window) speechSynthesis.cancel();
   document.querySelectorAll('.reading').forEach(x=>x.classList.remove('reading'));
