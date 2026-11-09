@@ -434,7 +434,7 @@
       <button class="speak" data-speak="crampPrevent">🔊 唸給我聽</button>
       <h2>怎麼預防？</h2>
       <ul class="big" id="crampPrevent">
-        <li>兩次透析間體重增加控制在乾體重的 3–5% 以內</li>
+        <li>兩次透析間體重增加控制在乾體重的 3%至5% 以內</li>
         <li>少吃鹹，才不會口渴喝太多水</li>
         <li>透析時穿寬鬆衣物，不影響手腳循環</li>
         <li>良好的體重控制和穩定的透析習慣，是遠離抽筋的最佳良藥</li>
@@ -585,7 +585,7 @@ const REFS = {
 const QUIZ = {
   dry: [
     { q:'乾體重 60 公斤，兩次透析之間體重最好不要超過多少？', o:['61.8–63 公斤','65 公斤','66 公斤'], a:0,
-      e:'增加量維持在乾體重的 3–5%：60×3%＝1.8 公斤，60×5%＝3 公斤，所以是 61.8–63 公斤。' },
+      e:'增加量維持在乾體重的 3%至5%：60×3%＝1.8 公斤，60×5%＝3 公斤，所以是 61.8–63 公斤。' },
     { q:'昨天尿量 300 毫升，今天大約可以喝多少水？', o:['300 毫升','1000 毫升','2000 毫升'], a:1,
       e:'前一日尿量＋700 毫升：300＋700＝1000 毫升，湯和稀飯也要算進去。' },
     { q:'量體重最好的時間是？', o:['晚餐後','清晨上完廁所、吃東西前','洗完澡後'], a:1,
@@ -640,6 +640,7 @@ function zhVoice(){
   return list.find(v => v.voiceURI === voicePref.uri) || list.find(v => /zh[-_]TW/i.test(v.lang)) || list[0];
 }
 function utter(text){
+  text = text.replace(/(\d)\s*[–—~～-]\s*(\d)/g, '$1至$2');
   const u = new SpeechSynthesisUtterance(text);
   const v = zhVoice();
   u.lang = v?.lang || 'zh-TW'; try { if (v) u.voice = v; } catch(e){}
@@ -1085,7 +1086,7 @@ Object.assign(QUIZ, {
       e:'短時間移除太多水分會讓血壓不穩，引發抽筋。' },
     { q:'抽筋時可以怎麼做？', o:['熱敷、輕柔按摩，並告訴護理人員','用力捶打','忍著不說'], a:0,
       e:'配合熱敷或輕柔按摩，也要馬上告訴護理人員。' },
-    { q:'預防抽筋最重要的是？', o:['體重增加控制在 3–5% 以內','透析前多喝水','多吃鹹的'], a:0,
+    { q:'預防抽筋最重要的是？', o:['體重增加控制在 3%至5% 以內','透析前多喝水','多吃鹹的'], a:0,
       e:'體重增加越多，透析時要脫的水越多，越容易抽筋。' },
   ],
   cardio: [
@@ -1572,7 +1573,7 @@ $('#recSave').addEventListener('click', () => {
   r.hidden = false; r.className = 'result z-' + g.z;
   const tip = recType === 'post'
     ? (Math.abs(g.kg) <= 0.5 ? '透析後接近乾體重 👍' : `透析後與乾體重差 ${g.kg.toFixed(1)} 公斤，如常有不適請告訴醫護人員。`)
-    : { green: '✅ 在安全範圍內', yellow: '⚠️ 已在 3–5% 上限範圍，接下來少喝水、少吃鹹', red: '⛔ 超過乾體重 5%！請控制水分；如果喘、水腫、胸悶，請聯絡透析室' }[g.z];
+    : { green: '✅ 在安全範圍內', yellow: '⚠️ 已在 3%至5% 上限範圍，接下來少喝水、少吃鹹', red: '⛔ 超過乾體重 5%！請控制水分；如果喘、水腫、胸悶，請聯絡透析室' }[g.z];
   r.innerHTML = `比乾體重多 <span class="num">${g.kg.toFixed(1)}</span> 公斤（${g.p.toFixed(1)}%）<br>${tip}`;
   $('#recW').value = '';
   renderLog();
@@ -1754,7 +1755,7 @@ $('#drinkUrine').addEventListener('change', e => {
 /* 最近 7 天摘要 */
 function weekSummary(){
   const lines = ['【透析好幫手】最近 7 天紀錄'];
-  if (store.dry > 0) lines.push(`乾體重 ${store.dry} 公斤（上限 +${CONFIG.GAIN_LOW}–${CONFIG.GAIN_HIGH}%：${(store.dry * (1 + CONFIG.GAIN_LOW / 100)).toFixed(1)}–${(store.dry * (1 + CONFIG.GAIN_HIGH / 100)).toFixed(1)} 公斤）`);
+  if (store.dry > 0) lines.push(`乾體重 ${store.dry} 公斤（上限 +${CONFIG.GAIN_LOW}%至${CONFIG.GAIN_HIGH}%：${(store.dry * (1 + CONFIG.GAIN_LOW / 100)).toFixed(1)}–${(store.dry * (1 + CONFIG.GAIN_HIGH / 100)).toFixed(1)} 公斤）`);
   lines.push('');
   let any = false;
   for (let i = 6; i >= 0; i--){
@@ -1792,7 +1793,7 @@ $('#printSheet').addEventListener('click', () => {
   const blank = Array.from({ length: 7 }, () => '<tr><td>&nbsp;/&nbsp;&nbsp;（&nbsp;&nbsp;）</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>').join('');
   $('#printArea').innerHTML = `
     <h1>透析週記錄表</h1>
-    <p>姓名：＿＿＿＿＿＿　乾體重：${store.dry > 0 ? store.dry + ' 公斤' : '＿＿＿ 公斤'}　體重增加上限：乾體重 ${CONFIG.GAIN_LOW}–${CONFIG.GAIN_HIGH}%${store.dry > 0 ? `（${(store.dry * (1 + CONFIG.GAIN_LOW / 100)).toFixed(1)}–${(store.dry * (1 + CONFIG.GAIN_HIGH / 100)).toFixed(1)} 公斤）` : ''}</p>
+    <p>姓名：＿＿＿＿＿＿　乾體重：${store.dry > 0 ? store.dry + ' 公斤' : '＿＿＿ 公斤'}　體重增加上限：乾體重 ${CONFIG.GAIN_LOW}%至${CONFIG.GAIN_HIGH}%${store.dry > 0 ? `（${(store.dry * (1 + CONFIG.GAIN_LOW / 100)).toFixed(1)}–${(store.dry * (1 + CONFIG.GAIN_HIGH / 100)).toFixed(1)} 公斤）` : ''}</p>
     <p>每日喝水上限＝前一日尿量＋${CONFIG.WATER_EXTRA_ML} 毫升　● 為透析日　透析室電話：${CONFIG.DIALYSIS_PHONE}</p>
     <table><thead><tr><th>日期</th><th>起床體重</th><th>透析前</th><th>透析後</th><th>昨天尿量</th><th>喝水</th><th>上限</th><th>血壓</th><th>備註</th></tr></thead>
     <tbody>${rows}${blank}</tbody></table>
