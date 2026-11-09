@@ -72,6 +72,7 @@
     background:#fff;color:var(--teal);padding:8px 14px}
   .btn.primary{background:var(--teal);color:#fff}
   .btn.on{background:var(--red);border-color:var(--red);color:#fff}
+  [data-ex].on,[data-min].on{background:var(--teal);border-color:var(--teal)}
   .btnrow{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
   .speak{float:right;min-height:44px;font-size:16px;padding:4px 12px;border-radius:12px;border:1px solid var(--line);background:#fff;color:var(--teal);font-weight:700}
 
@@ -121,12 +122,13 @@
       <button class="unit hot" data-go="fistula"><span class="emo">💪</span><b>瘻管照護</b><span>摸摸看、聽聽看，哪些事不能做</span></button>
       <button class="unit alert" data-go="er" style="grid-column:1/-1"><span class="emo">🚨</span><b>何時要立即就醫</b><span>出現這些情況，馬上打電話</span></button>
     </div>
-    <div class="sectiontitle">即將推出</div>
+    <div class="sectiontitle">更多衛教</div>
     <div class="grid">
-      <div class="unit soon"><span class="emo">🩸</span><b>認識血液透析</b><span>透析器怎麼幫你清血</span></div>
-      <div class="unit soon"><span class="emo">🍽️</span><b>飲食與用藥</b><span>低磷、低鉀、限鈉</span></div>
-      <div class="unit soon"><span class="emo">🚶</span><b>運動</b><span>每次 20–30 分鐘</span></div>
-      <div class="unit soon"><span class="emo">🦵</span><b>肌肉抽搐</b><span>為什麼會抽筋</span></div>
+      <button class="unit" data-go="intro"><span class="emo">🩸</span><b>認識血液透析</b><span>透析器怎麼幫你清血</span></button>
+      <button class="unit" data-go="diet"><span class="emo">🍽️</span><b>飲食與用藥</b><span>食物分類小遊戲</span></button>
+      <button class="unit" data-go="exercise"><span class="emo">🚶</span><b>運動</b><span>跟著做＋計時</span></button>
+      <button class="unit" data-go="cramp"><span class="emo">🦵</span><b>肌肉抽搐</b><span>為什麼會抽筋、怎麼辦</span></button>
+      <button class="unit" data-go="cardio" style="grid-column:1/-1"><span class="emo">❤️</span><b>預防心臟血管疾病</b><span>六件生活中做得到的事</span></button>
     </div>
   </section>
 
@@ -247,6 +249,178 @@
       <p class="muted" style="font-size:17px">下床要慢慢起身；透析當天不要提重物或劇烈運動。</p>
     </div>
     <div class="card"><h3>參考資料</h3><ol class="refs" id="refs-er"></ol></div>
+  </section>
+
+  <!-- ========== 認識血液透析 ========== -->
+  <section class="view" id="v-intro">
+    <div class="stage" id="stage-intro"><div class="badge" id="introBadge">🩸 血液往右流，毒素和水分穿過膜到透析液</div><div class="hint">可用手指旋轉</div></div>
+    <div class="card">
+      <h2>脫水速度試試看</h2>
+      <input type="range" id="ufRate" min="1" max="3" step="1" value="2" aria-label="脫水速度">
+      <div style="display:flex;justify-content:space-between;font-size:17px" class="muted"><span>慢</span><span>適中</span><span>太快</span></div>
+      <div class="result z-green" id="ufResult"></div>
+    </div>
+    <div class="card">
+      <button class="speak" data-speak="introWhat">🔊 唸給我聽</button>
+      <h2>什麼是血液透析？</h2>
+      <p id="introWhat">血液透析是利用透析機，把體內累積的廢物，例如尿素、肌酸酐，還有多餘的水分和電解質排出來，代替一部分腎臟的功能。一般建議每週三次，每次約四小時，實際次數和時間依醫師評估調整。</p>
+    </div>
+    <div class="card">
+      <h2>透析前、中、後</h2>
+      <h3>透析前</h3>
+      <ul class="big">
+        <li>準時到院，先量體重</li>
+        <li>不要空腹或吃太飽，吃清淡的</li>
+        <li>發燒、咳嗽、不舒服要主動說</li>
+        <li>依醫囑服藥，有些藥要透析後才吃</li>
+      </ul>
+      <h3>透析中</h3>
+      <ul class="big">
+        <li>放輕鬆，打針的手不要大動作，以免針頭移位</li>
+        <li>頭暈、噁心、抽筋、胸悶或出血，馬上告訴醫護人員</li>
+      </ul>
+      <h3>透析後</h3>
+      <ul class="big">
+        <li>慢慢起身下床，避免姿勢性低血壓</li>
+        <li>針孔加壓止血約 10–15 分鐘</li>
+        <li>當天不提重物、不劇烈運動</li>
+      </ul>
+    </div>
+    <div class="card"><h2>小測驗</h2><div id="quiz-intro"></div></div>
+    <div class="card"><h3>參考資料</h3><ol class="refs" id="refs-intro"></ol></div>
+  </section>
+
+  <!-- ========== 飲食 ========== -->
+  <section class="view" id="v-diet">
+    <div class="stage" id="stage-diet"><div class="badge" id="dietBadge">先點一樣食物，再選要放哪一籃</div></div>
+    <div class="card">
+      <h2>這個要放哪一籃？ <span class="muted" id="dietScore" style="font-size:18px"></span></h2>
+      <div class="btnrow" style="grid-template-columns:1fr 1fr 1fr">
+        <button class="btn" data-basket="ok" style="border-color:var(--green);color:var(--green)">🟢 適量吃</button>
+        <button class="btn" data-basket="less" style="border-color:var(--yellow);color:var(--yellow)">🟡 少吃</button>
+        <button class="btn" data-basket="avoid" style="border-color:var(--red);color:var(--red)">🔴 避免</button>
+      </div>
+      <div class="result" id="dietResult" hidden></div>
+      <button class="btn" id="dietReset" style="width:100%;margin-top:10px">重新開始</button>
+    </div>
+    <div class="card">
+      <button class="speak" data-speak="dietKey">🔊 唸給我聽</button>
+      <h2>飲食與用藥重點</h2>
+      <ul class="big" id="dietKey">
+        <li>蛋白質要足量：雞蛋、魚肉、瘦肉、豆腐</li>
+        <li>少吃高鉀水果：香蕉、釋迦、奇異果、哈密瓜、橘子</li>
+        <li>楊桃絕對不要吃，可能引發神經毒性</li>
+        <li>限磷：避免乳製品、內臟、酵母、堅果</li>
+        <li>限鈉：少吃加工食品、罐頭、醃製品、泡麵、濃湯</li>
+        <li>不要用低鈉鹽或美味鹽，裡面含高鉀</li>
+        <li>磷結合劑（鈣片）要隨餐吃並咬碎，才能帶走食物中的磷</li>
+        <li>沒有醫師同意，不要自己吃成藥或草藥</li>
+      </ul>
+    </div>
+    <div class="card"><h2>小測驗</h2><div id="quiz-diet"></div></div>
+    <div class="card"><h3>參考資料</h3><ol class="refs" id="refs-diet"></ol></div>
+  </section>
+
+  <!-- ========== 運動 ========== -->
+  <section class="view" id="v-exercise">
+    <div class="stage" id="stage-exercise"><div class="badge" id="exBadge">坐姿抬腿：左右輪流，慢慢抬起再放下</div><div class="hint">可用手指旋轉</div></div>
+    <div class="card">
+      <h2>選一個動作跟著做</h2>
+      <div class="btnrow" style="grid-template-columns:1fr 1fr 1fr">
+        <button class="btn on" data-ex="raise">坐姿抬腿</button>
+        <button class="btn" data-ex="band">彈力帶</button>
+        <button class="btn" data-ex="bike">腳踏車</button>
+      </div>
+    </div>
+    <div class="card">
+      <h2>運動計時</h2>
+      <div style="text-align:center;font-size:56px;font-weight:800;font-variant-numeric:tabular-nums" id="exClock">05:00</div>
+      <div class="btnrow" style="grid-template-columns:repeat(4,1fr)">
+        <button class="btn on" data-min="5">5 分</button>
+        <button class="btn" data-min="10">10 分</button>
+        <button class="btn" data-min="20">20 分</button>
+        <button class="btn" data-min="30">30 分</button>
+      </div>
+      <button class="btn primary" id="exStart" style="width:100%;margin-top:10px">▶ 開始</button>
+      <p class="muted" style="font-size:17px">每週至少 3 次，每次 20–30 分鐘；剛開始可以從 5–10 分鐘做起。強度維持在「微喘但還能說話」。</p>
+    </div>
+    <div class="card">
+      <h2>運動三要三不</h2>
+      <table class="simple">
+        <tr><th>三要</th><th>三不</th></tr>
+        <tr><td>要先問過醫療團隊</td><td>不壓迫到瘻管</td></tr>
+        <tr><td>運動前後暖身、收操 5–10 分鐘</td><td>透析剛結束不做激烈運動</td></tr>
+        <tr><td>穿防滑、包覆好的運動鞋</td><td>極度不適或發燒時不勉強</td></tr>
+      </table>
+      <p class="muted" style="font-size:17px">不要空腹運動，可在飯後 1–2 小時；循序漸進增加時間和強度。</p>
+    </div>
+    <div class="card" style="border:2px solid var(--red)">
+      <h2 style="color:var(--red)">出現這些警訊，馬上停止</h2>
+      <ul class="big">
+        <li>嚴重呼吸困難或異常氣喘</li>
+        <li>胸悶、胸痛、心悸、冒冷汗</li>
+        <li>突然頭暈、視線模糊、臉色蒼白</li>
+        <li>瘻管紅腫熱痛或異常出血</li>
+      </ul>
+    </div>
+    <div class="card"><h2>小測驗</h2><div id="quiz-exercise"></div></div>
+    <div class="card"><h3>參考資料</h3><ol class="refs" id="refs-exercise"></ol></div>
+  </section>
+
+  <!-- ========== 抽筋 ========== -->
+  <section class="view" id="v-cramp">
+    <div class="stage" id="stage-cramp"><div class="badge" id="crampBadge">點下方原因，看看小腿為什麼會抽筋</div><div class="hint">可用手指旋轉</div></div>
+    <div class="card">
+      <h2>為什麼會抽筋？</h2>
+      <div class="btnrow" style="grid-template-columns:1fr">
+        <button class="btn" data-cause="dehydrate">💧 脫水速度太快</button>
+        <button class="btn" data-cause="electrolyte">⚡ 電解質不平衡</button>
+        <button class="btn" data-cause="lowbp">📉 血壓下降，肌肉血流變少</button>
+      </div>
+      <div class="result z-yellow" id="crampCause" hidden></div>
+    </div>
+    <div class="card">
+      <h2>抽筋了怎麼辦？</h2>
+      <div class="btnrow" style="grid-template-columns:1fr 1fr 1fr">
+        <button class="btn" data-relief="heat">🔥 熱敷</button>
+        <button class="btn" data-relief="massage">🤲 輕柔按摩</button>
+        <button class="btn" data-relief="stretch">🦶 伸展</button>
+      </div>
+      <p class="muted" style="font-size:17px">透析中感覺肌肉僵硬或微微抽動，要立刻告訴護理人員。</p>
+    </div>
+    <div class="card">
+      <button class="speak" data-speak="crampPrevent">🔊 唸給我聽</button>
+      <h2>怎麼預防？</h2>
+      <ul class="big" id="crampPrevent">
+        <li>兩次透析間體重增加控制在乾體重的 3–5% 以內</li>
+        <li>少吃鹹，才不會口渴喝太多水</li>
+        <li>透析時穿寬鬆衣物，不影響手腳循環</li>
+        <li>良好的體重控制和穩定的透析習慣，是遠離抽筋的最佳良藥</li>
+      </ul>
+    </div>
+    <div class="card"><h2>小測驗</h2><div id="quiz-cramp"></div></div>
+    <div class="card"><h3>參考資料</h3><ol class="refs" id="refs-cramp"></ol></div>
+  </section>
+
+  <!-- ========== 心血管 ========== -->
+  <section class="view" id="v-cardio">
+    <div class="card">
+      <button class="speak" data-speak="cardioList">🔊 唸給我聽</button>
+      <h2>預防心臟血管疾病的六件事</h2>
+      <ol class="big" id="cardioList">
+        <li><b>戒菸</b>：戒菸一年後，心肌梗塞的風險會減少一半。</li>
+        <li><b>均衡飲食</b>：多吃高纖食物，少吃飽和脂肪與反式脂肪，控制鹽和糖。</li>
+        <li><b>定期運動</b>：在體力許可下，每天約 30 分鐘溫和運動。</li>
+        <li><b>控制體重</b>：降低高血壓、高血脂和糖尿病的風險。</li>
+        <li><b>定期健康檢查</b>：特別是膽固醇和血壓。</li>
+        <li><b>不要濫用抗凝血藥</b>：一定要在醫師監控下使用，自行服用可能造成胃出血、腦出血。</li>
+      </ol>
+    </div>
+    <div class="card">
+      <p>心血管疾病一旦發作，可能造成失能，也會成為家人沉重的負擔。從飲食、運動、戒菸到生活習慣，每一環都要持之以恆。</p>
+    </div>
+    <div class="card"><h2>小測驗</h2><div id="quiz-cardio"></div></div>
+    <div class="card"><h3>參考資料</h3><ol class="refs" id="refs-cardio"></ol></div>
   </section>
 </main>
 <div class="toast" id="toast"></div>
@@ -395,6 +569,7 @@ function disposeScene(){
   if (!current) return;
   stopLoop();
   current.cleanup?.();
+  current.cleanups?.forEach(f => f());
   current.controls.dispose();
   current.scene.traverse(o=>{
     o.geometry?.dispose();
@@ -659,9 +834,503 @@ document.querySelectorAll('[data-dont]').forEach(b=>b.addEventListener('click',(
   const r = $('#dontResult'); r.hidden = !dontKey; if (dontKey) r.textContent = '❌ ' + DONT[k];
 }));
 
+/* ================= 第二階段：資料 ================= */
+Object.assign(REFS, {
+  intro: [
+    '台灣腎臟醫學會（2023）．《血液透析臨床照護指引》．https://www.tsn.org.tw/',
+    '衛生福利部國民健康署（2022）．《慢性腎臟病健康照護手冊》．https://www.hpa.gov.tw/Pages/EBook.aspx?nodeid=1157',
+    '衛生福利部（2023）．《慢性腎臟病防治手冊》．https://www.mohw.gov.tw/',
+  ],
+  diet: [
+    '吳紅蓮、楊麗芬、許薳尹、王郁薇、周雪琦、徐瑋婷（2010）．慢性腎臟病控制高血磷的飲食知識與衛教技巧．腎臟與透析，22(3)，206-209．https://doi.org/10.6340/KD.2010(3).08',
+    '陳雅伶等（2025）．運用跨團隊合作提升慢性腎臟病病人照護認知正確率．醫院，58(2)，30-40．',
+    '台灣腎臟醫學會（2023）．《血液透析臨床照護指引》．https://www.tsn.org.tw/',
+    '衛生福利部國民健康署（2022）．《慢性腎臟病健康照護手冊》．https://www.hpa.gov.tw/',
+  ],
+  exercise: [
+    '台灣腎臟醫學會（2018）．慢性腎臟病預防及治療手冊．',
+    'Effect of intradialytic exercise on dialysis efficacy and quality of life. The Journal of Nursing Research (2020).',
+    '孫婉娜、湯采儒、林清雯（2023）．透過下肢復健運動改善血液透析病人下肢肌力之案例報告及系統性文獻回顧．腎臟與透析，35(2)，89-93．',
+    '劉淑樺、林秋菊、葉淑惠、周偉倪、陳彰惠（2002）．運動訓練對血液透析病患之成效．台灣醫學，6(2)，129-142．https://doi.org/10.6320/FJM.2002.6(2).01',
+    '財團法人腎臟病防治基金會（2020）．不愛運動居然是腎臟病的高危險群．https://www.tckdf.org.tw/',
+    '明暘診所（2018）．洗腎病患可以做的運動．https://mingyangclinic.com.tw/casestudies_detail.php?id=44',
+  ],
+  cramp: [
+    '台灣腎臟醫學會．腎臟與透析（Kidney and Dialysis）．Ainosco Press．https://www.ainoscopress.com/kd.html',
+    '台灣腎臟醫學會（編）（2025）．台灣血液透析臨床診療指引．https://www.tsn.org.tw/',
+  ],
+  cardio: [
+    '認識心血管疾病，預防與改善心血管疾病的5個方法．健康專科．https://www.healthspecialist.com.tw/',
+    '衛生福利部國民健康署（2022）．《慢性腎臟病健康照護手冊》．https://www.hpa.gov.tw/',
+  ],
+});
+
+Object.assign(QUIZ, {
+  intro: [
+    { q:'血液透析一般建議多久做一次？', o:['每週 1 次','每週 3 次，每次約 4 小時','每天都要做'], a:1,
+      e:'一般每週 3 次、每次約 4 小時，實際依醫師評估調整。' },
+    { q:'透析中，打針的那隻手應該？', o:['放輕鬆，避免大動作','可以隨意活動','一直用力握拳'], a:0,
+      e:'大動作可能讓針頭移位，要保持放鬆。' },
+    { q:'透析結束下床時要？', o:['馬上站起來走','慢慢起身','先跑一圈'], a:1,
+      e:'慢慢起身可以避免姿勢性低血壓造成頭暈。' },
+  ],
+  diet: [
+    { q:'下列哪一種要避免，可能引發神經毒性？', o:['雞蛋','楊桃','魚肉'], a:1,
+      e:'楊桃對透析病人可能引發神經毒性，絕對不要吃。' },
+    { q:'磷結合劑（鈣片）應該怎麼吃？', o:['空腹吃','隨餐吃並咬碎','睡前吃'], a:1,
+      e:'隨餐咬碎，才能有效帶走食物中的磷。' },
+    { q:'為什麼不能用低鈉鹽或美味鹽？', o:['比較貴','裡面含高鉀','味道太淡'], a:1,
+      e:'低鈉鹽用鉀取代鈉，透析病人吃了容易高血鉀。' },
+  ],
+  exercise: [
+    { q:'運動強度應該維持在？', o:['喘到不能說話','微喘但還能說話','完全不會喘'], a:1,
+      e:'「微喘但仍可說話」是適合的強度。' },
+    { q:'剛開始運動，可以先做多久？', o:['5–10 分鐘','一次 1 小時','先不要動'], a:0,
+      e:'可以從 5–10 分鐘開始，慢慢增加到每次 20–30 分鐘。' },
+    { q:'運動時突然胸悶、胸痛，應該？', o:['咬牙做完','立即停止','加快速度'], a:1,
+      e:'胸悶、胸痛、心悸、冒冷汗都是警訊，要立即停止。' },
+  ],
+  cramp: [
+    { q:'下列哪一個是透析中抽筋的原因？', o:['脫水速度太快','睡得太飽','頭髮太長'], a:0,
+      e:'短時間移除太多水分會讓血壓不穩，引發抽筋。' },
+    { q:'抽筋時可以怎麼做？', o:['熱敷、輕柔按摩，並告訴護理人員','用力捶打','忍著不說'], a:0,
+      e:'配合熱敷或輕柔按摩，也要馬上告訴護理人員。' },
+    { q:'預防抽筋最重要的是？', o:['體重增加控制在 3–5% 以內','透析前多喝水','多吃鹹的'], a:0,
+      e:'體重增加越多，透析時要脫的水越多，越容易抽筋。' },
+  ],
+  cardio: [
+    { q:'抗凝血藥可以當保健品自己吃嗎？', o:['可以','不行，要在醫師監控下使用','每天吃一顆比較好'], a:1,
+      e:'自行濫用可能造成凝血障礙，甚至胃出血、腦出血。' },
+    { q:'戒菸一年後，心肌梗塞的風險會？', o:['不變','減少一半','增加'], a:1,
+      e:'研究顯示，戒菸一年後心肌梗塞風險減少一半。' },
+  ],
+});
+
+/* ================= 共用：文字標籤、點擊 ================= */
+function labelSprite(text, { bg = 'rgba(255,255,255,0.95)', fg = '#1d2a2b', size = 44, border = null, scale = 1 } = {}){
+  const c = document.createElement('canvas'), x = c.getContext('2d');
+  const font = `700 ${size}px -apple-system,"PingFang TC","Noto Sans TC",sans-serif`;
+  x.font = font;
+  const lines = String(text).split('\n');
+  const w = Math.ceil(Math.max(...lines.map(l => x.measureText(l).width))) + size;
+  const h = Math.ceil(lines.length * size * 1.25 + size * 0.6);
+  c.width = w; c.height = h;
+  x.font = font; x.textAlign = 'center'; x.textBaseline = 'middle';
+  const r = Math.min(h / 2, size * 0.6);
+  x.fillStyle = bg; x.beginPath(); x.roundRect ? x.roundRect(2, 2, w - 4, h - 4, r) : x.rect(2, 2, w - 4, h - 4); x.fill();
+  if (border){ x.lineWidth = 6; x.strokeStyle = border; x.stroke(); }
+  x.fillStyle = fg;
+  lines.forEach((l, i) => x.fillText(l, w / 2, h / 2 + (i - (lines.length - 1) / 2) * size * 1.25));
+  const tex = new THREE.CanvasTexture(c); tex.colorSpace = THREE.SRGBColorSpace;
+  const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, depthTest: false, transparent: true }));
+  const k = 0.0042 * scale; s.scale.set(w * k, h * k, 1); s.renderOrder = 5;
+  return s;
+}
+
+function addTap(S, targets, cb){
+  const ray = new THREE.Raycaster(), ndc = new THREE.Vector2(), el = renderer.domElement;
+  let downAt = null;
+  const onDown = e => { downAt = [e.clientX, e.clientY]; };
+  const onUp = e => {
+    if (!downAt || Math.hypot(e.clientX - downAt[0], e.clientY - downAt[1]) > 8) return;
+    const r = el.getBoundingClientRect();
+    ndc.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+    ray.setFromCamera(ndc, S.camera);
+    const hit = ray.intersectObjects(typeof targets === 'function' ? targets() : targets, true)[0];
+    if (hit) cb(hit.object);
+  };
+  el.addEventListener('pointerdown', onDown); el.addEventListener('pointerup', onUp);
+  (S.cleanups ||= []).push(() => { el.removeEventListener('pointerdown', onDown); el.removeEventListener('pointerup', onUp); });
+}
+const mat = (c, o = {}) => new THREE.MeshStandardMaterial({ color: c, roughness: 0.6, ...o });
+
+/* ================= 場景三：透析器（中空纖維） ================= */
+function buildIntro(stage){
+  const S = baseScene(stage, new THREE.Vector3(0.6, 2.4, 6.4));
+  S.controls.target.set(0, 0, 0);
+  const L = 5.2, R_IN = 0.6, R_OUT = 1.25;
+  const shell = new THREE.Mesh(new THREE.CylinderGeometry(R_OUT, R_OUT, L, 48, 1, true),
+    mat(0x8fd0e8, { transparent: true, opacity: 0.16, side: THREE.DoubleSide, depthWrite: false }));
+  shell.rotation.z = Math.PI / 2; S.scene.add(shell);
+  const fiber = new THREE.Mesh(new THREE.CylinderGeometry(R_IN, R_IN, L, 48, 1, true),
+    mat(0xf0c9cc, { transparent: true, opacity: 0.28, side: THREE.DoubleSide, depthWrite: false }));
+  fiber.rotation.z = Math.PI / 2; S.scene.add(fiber);
+  const mesh = new THREE.Mesh(new THREE.CylinderGeometry(R_IN + 0.004, R_IN + 0.004, L, 28, 14, true),
+    new THREE.MeshBasicMaterial({ color: 0xb06d7d, wireframe: true, transparent: true, opacity: 0.3 }));
+  mesh.rotation.z = Math.PI / 2; S.scene.add(mesh);
+
+  const mk = (geo, m) => { const o = new THREE.Mesh(geo, m); S.scene.add(o); return o; };
+  const polar = (o, x, r, th) => o.position.set(x, r * Math.cos(th), r * Math.sin(th));
+  const rnd = (a, b) => a + Math.random() * (b - a);
+  const rbcGeo = new THREE.SphereGeometry(0.14, 16, 10), rbcMat = mat(0xd93a3a);
+  const toxGeo = new THREE.SphereGeometry(0.06, 10, 8), toxMat = mat(0xf2b705, { emissive: 0x5a4000 });
+  const watGeo = new THREE.SphereGeometry(0.06, 10, 8), watMat = mat(0x2a7bd1, { emissive: 0x0a2a50 });
+  const dlyGeo = new THREE.SphereGeometry(0.035, 8, 6), dlyMat = mat(0xbfe6f5);
+
+  const rbcs = Array.from({ length: 16 }, () => { const o = mk(rbcGeo, rbcMat); o.scale.set(1, 0.45, 1);
+    o.userData = { x: rnd(-L / 2, L / 2), r: rnd(0, 0.38), th: rnd(0, 6.28), spin: rnd(-1, 1) }; return o; });
+  const movers = [];
+  const spawn = (geo, m, kind, n) => { for (let i = 0; i < n; i++){ const o = mk(geo, m);
+    o.userData = { kind, x: rnd(-L / 2, L / 2), r: rnd(0, R_IN - 0.1), th: rnd(0, 6.28), out: Math.random() < 0.3, vr: 0 };
+    if (o.userData.out) o.userData.r = rnd(R_IN + 0.15, R_OUT - 0.1); movers.push(o); } };
+  spawn(toxGeo, toxMat, 'tox', 34);
+  spawn(watGeo, watMat, 'wat', 30);
+  const dly = Array.from({ length: 40 }, () => { const o = mk(dlyGeo, dlyMat);
+    o.userData = { x: rnd(-L / 2, L / 2), r: rnd(R_IN + 0.12, R_OUT - 0.08), th: rnd(0, 6.28) }; return o; });
+
+  const lab = (t, x, y, opt) => { const s = labelSprite(t, opt); s.position.set(x, y, 0); S.scene.add(s); return s; };
+  lab('血液 →', -1.6, 0, { bg: 'rgba(217,58,58,0.92)', fg: '#fff', scale: 0.9 });
+  lab('← 透析液', 1.4, -1.55, { bg: 'rgba(42,123,209,0.92)', fg: '#fff', scale: 0.9 });
+  lab('🟡 毒素  🔵 水分', -1.3, -1.55, { scale: 0.85 });
+
+  let uf = 2;
+  S.setUF = v => { uf = v; };
+  S.update = (dt, t) => {
+    const flow = 0.9;
+    rbcs.forEach(o => { const u = o.userData; u.x += flow * dt * (0.8 + uf * 0.05); if (u.x > L / 2) u.x -= L;
+      polar(o, u.x, u.r, u.th); o.rotation.x += u.spin * dt; });
+    const p = { tox: 0.45, wat: [0, 0.12, 0.45, 1.3][uf] };
+    movers.forEach(o => { const u = o.userData;
+      if (!u.out){
+        u.x += flow * dt;
+        if (u.vr === 0 && Math.random() < p[u.kind] * dt) u.vr = 0.55;
+        u.r += u.vr * dt;
+        if (u.r > R_IN + 0.15){ u.out = true; u.vr = 0; }
+      } else {
+        u.x -= 0.55 * dt;
+      }
+      if (u.x > L / 2 || u.x < -L / 2){ u.out = false; u.vr = 0; u.x = -L / 2 + Math.random() * 0.3; u.r = rnd(0, R_IN - 0.1); }
+      polar(o, u.x, u.r, u.th);
+    });
+    dly.forEach(o => { const u = o.userData; u.x -= 0.55 * dt; if (u.x < -L / 2) u.x += L; polar(o, u.x, u.r, u.th); });
+  };
+  return S;
+}
+
+function updateUF(){
+  const v = +$('#ufRate').value;
+  const info = {
+    1: ['z-green', '🐢 脫水慢：血壓穩定，但水分可能脫不完，需要醫師依體重評估。'],
+    2: ['z-green', '👍 適中：毒素和水分穩定排出，血壓平穩。'],
+    3: ['z-red', '⚠️ 太快：短時間移除太多水分，血壓容易下降，可能頭暈、抽筋、噁心。兩次透析間體重增加越多，就越需要快速脫水。'],
+  }[v];
+  const el = $('#ufResult'); el.className = 'result ' + info[0]; el.textContent = info[1];
+  $('#introBadge').textContent = v === 3 ? '🔵 水分大量流失 → 血壓下降' : '🩸 血液往右流，毒素和水分穿過膜到透析液';
+  current?.setUF?.(v);
+}
+$('#ufRate').addEventListener('input', updateUF);
+
+/* ================= 場景四：飲食分類 ================= */
+const FOODS = [
+  { n: '雞蛋', e: '🥚', ok: ['ok'], why: '優質蛋白質，要足量攝取。' },
+  { n: '魚肉', e: '🐟', ok: ['ok'], why: '優質蛋白質，維持營養和肌肉。' },
+  { n: '瘦肉', e: '🥩', ok: ['ok'], why: '優質蛋白質，適量攝取。' },
+  { n: '豆腐', e: '🍲', ok: ['ok'], why: '優質蛋白質，可以適量吃。' },
+  { n: '香蕉', e: '🍌', ok: ['less', 'avoid'], why: '高鉀水果，吃多容易心律不整，要少吃。' },
+  { n: '奇異果', e: '🥝', ok: ['less', 'avoid'], why: '高鉀水果，要少吃。' },
+  { n: '哈密瓜', e: '🍈', ok: ['less', 'avoid'], why: '高鉀水果，要少吃。' },
+  { n: '楊桃', e: '⭐', ok: ['avoid'], why: '可能引發神經毒性，絕對不要吃！' },
+  { n: '牛奶', e: '🥛', ok: ['avoid'], why: '乳製品含高磷，透析很難排掉，要避免。' },
+  { n: '堅果', e: '🥜', ok: ['avoid'], why: '堅果含高磷，要避免。' },
+  { n: '泡麵', e: '🍜', ok: ['avoid'], why: '加工食品、高鈉，吃了會口渴喝太多水。' },
+  { n: '低鈉鹽', e: '🧂', ok: ['avoid'], why: '低鈉鹽含高鉀，不要使用。' },
+];
+const BASKETS = { ok: { name: '適量吃', c: 0x2e8b3d, x: -1.75 }, less: { name: '少吃', c: 0xc98a00, x: 0 }, avoid: { name: '避免', c: 0xc62828, x: 1.75 } };
+
+function buildDiet(stage){
+  const S = baseScene(stage, new THREE.Vector3(0, 3.1, 7.6));
+  S.controls.target.set(0, 0.05, 0);
+  S.controls.minAzimuthAngle = -0.6; S.controls.maxAzimuthAngle = 0.6;
+  const table = new THREE.Mesh(new THREE.BoxGeometry(5.4, 0.12, 2.0), mat(0xc9a27a));
+  table.position.set(0, -0.15, -1.0); S.scene.add(table);
+
+  const baskets = {};
+  for (const k in BASKETS){ const b = BASKETS[k];
+    const g = new THREE.Group(); g.position.set(b.x, -1.05, 1.2); S.scene.add(g);
+    const wall = new THREE.Mesh(new THREE.CylinderGeometry(0.62, 0.48, 0.55, 32, 1, true), mat(b.c, { side: THREE.DoubleSide }));
+    const bottom = new THREE.Mesh(new THREE.CircleGeometry(0.48, 32), mat(b.c)); bottom.rotation.x = -Math.PI / 2; bottom.position.y = -0.27;
+    const rim = new THREE.Mesh(new THREE.TorusGeometry(0.62, 0.04, 8, 32), mat(0xffffff)); rim.rotation.x = Math.PI / 2; rim.position.y = 0.27;
+    g.add(wall, bottom, rim);
+    const l = labelSprite(b.name, { bg: '#' + b.c.toString(16).padStart(6, '0'), fg: '#fff', scale: 0.8 }); l.position.set(0, 0.62, 0.2); g.add(l);
+    g.userData.key = k; g.traverse(o => o.userData.basket = k);
+    baskets[k] = { g, count: 0 };
+  }
+
+  const items = FOODS.map((f, i) => {
+    const s = labelSprite(`${f.e}\n${f.n}`, { size: 56, scale: 1.25, border: '#dcd8cf' });
+    const col = i % 4, row = Math.floor(i / 4);
+    const home = new THREE.Vector3(-2.1 + col * 1.4, 1.45 - row * 0.8, -1.0 + row * 0.35);
+    s.position.copy(home); S.scene.add(s);
+    s.userData = { food: i, home, state: 'idle', base: s.scale.clone() };
+    return s;
+  });
+
+  let selected = null, anim = [];
+  S.select = i => {
+    items.forEach(s => s.scale.copy(s.userData.base));
+    selected = i === null ? null : items[i];
+    if (selected) S.onSelect?.(FOODS[i]);
+  };
+  S.drop = key => {
+    if (!selected) return toast('先點一樣食物');
+    const f = FOODS[selected.userData.food];
+    const right = f.ok.includes(key);
+    if (right){
+      const b = baskets[key], n = b.count++;
+      const to = new THREE.Vector3(BASKETS[key].x + ((n % 3) - 1) * 0.3, -0.5 + Math.floor(n / 3) * 0.3, 1.2 + 0.05 * (n % 2));
+      selected.userData.state = 'done';
+      anim.push({ s: selected, from: selected.position.clone(), to, t: 0 });
+      selected.scale.copy(selected.userData.base).multiplyScalar(0.62);
+      selected = null;
+    } else {
+      selected.userData.shake = 0.6;
+    }
+    S.onResult?.(f, right, key);
+  };
+  S.reset = () => { anim = []; selected = null; for (const k in baskets) baskets[k].count = 0;
+    items.forEach(s => { s.position.copy(s.userData.home); s.scale.copy(s.userData.base); s.userData.state = 'idle'; s.userData.shake = 0; }); };
+  S.doneCount = () => items.filter(s => s.userData.state === 'done').length;
+
+  addTap(S, () => [...items.filter(s => s.userData.state === 'idle'), ...Object.values(baskets).map(b => b.g)], o => {
+    if (o.userData.basket) return S.drop(o.userData.basket);
+    if (o.userData.food !== undefined) S.select(o.userData.food);
+  });
+
+  S.update = (dt, t) => {
+    items.forEach(s => { const u = s.userData; if (u.state !== 'idle') return;
+      let y = u.home.y, x = u.home.x;
+      if (s === selected){ y += 0.15 + Math.sin(t * 5) * 0.05; s.scale.copy(u.base).multiplyScalar(1.18); }
+      if (u.shake > 0){ u.shake -= dt; x += Math.sin(u.shake * 50) * 0.08; }
+      s.position.set(x, y, u.home.z); });
+    anim = anim.filter(a => { a.t = Math.min(1, a.t + dt * 1.6); const e = 1 - (1 - a.t) ** 3;
+      a.s.position.lerpVectors(a.from, a.to, e); a.s.position.y += Math.sin(e * Math.PI) * 0.9; return a.t < 1; });
+  };
+  return S;
+}
+
+function dietScore(){ $('#dietScore').textContent = current?.doneCount ? `（${current.doneCount()}/${FOODS.length}）` : ''; }
+document.querySelectorAll('[data-basket]').forEach(b => b.addEventListener('click', () => current?.drop?.(b.dataset.basket)));
+$('#dietReset').addEventListener('click', () => { current?.reset?.(); $('#dietResult').hidden = true; dietScore(); $('#dietBadge').textContent = '先點一樣食物，再選要放哪一籃'; });
+
+/* ================= 場景五：運動跟做 ================= */
+function buildExercise(stage){
+  const S = baseScene(stage, new THREE.Vector3(3.0, 0.9, 4.0));
+  S.controls.target.set(0, -0.55, 0.2);
+  const skin = mat(0xe8b896), shirt = mat(0x2f8f8a), pants = mat(0x5a6470), hair = mat(0xdddddd), shoe = mat(0x333333);
+  const cap = (r, len, m) => { const o = new THREE.Mesh(new THREE.CapsuleGeometry(r, len, 6, 14), m); o.position.y = -len / 2; return o; };
+
+  // 椅子
+  const chair = new THREE.Group(); S.scene.add(chair);
+  const seat = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.08, 0.7), mat(0x8a5a2b)); seat.position.set(0, -0.1, 0.05); chair.add(seat);
+  const back = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.9, 0.06), mat(0x8a5a2b)); back.position.set(0, 0.35, -0.3); chair.add(back);
+  [[-0.35, 0.35], [0.35, 0.35], [-0.35, -0.25], [0.35, -0.25]].forEach(([x, z]) => {
+    const l = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.75), mat(0x6b4420)); l.position.set(x, -0.52, z); chair.add(l); });
+
+  // 身體（臀部在原點，面向 +z）
+  const body = new THREE.Group(); body.position.set(0, -0.62, 0); S.scene.add(body);
+  chair.position.y = -0.7;
+  const torso = cap(0.22, 0.5, shirt); torso.position.y = 0.38; body.add(torso);
+  const head = new THREE.Mesh(new THREE.SphereGeometry(0.2, 24, 16), skin); head.position.y = 0.98; body.add(head);
+  const hairCap = new THREE.Mesh(new THREE.SphereGeometry(0.205, 24, 12, 0, Math.PI * 2, 0, Math.PI * 0.5), hair);
+  hairCap.position.y = 0.99; hairCap.rotation.x = -0.25; body.add(hairCap);
+  const eyeM = new THREE.MeshBasicMaterial({ color: 0x1d2a2b });
+  [-0.07, 0.07].forEach(x => { const e = new THREE.Mesh(new THREE.SphereGeometry(0.022, 8, 6), eyeM); e.position.set(x, 1.0, 0.18); body.add(e); });
+  const smile = new THREE.Mesh(new THREE.TorusGeometry(0.06, 0.012, 6, 16, Math.PI), eyeM); smile.rotation.z = Math.PI; smile.position.set(0, 0.93, 0.185); body.add(smile);
+
+  const A = 0.45, B = 0.45; // 大腿、小腿長
+  const makeLeg = side => {
+    const hip = new THREE.Group(); hip.position.set(side * 0.13, 0, 0.02); body.add(hip);
+    hip.add(cap(0.1, A - 0.1, pants));
+    const knee = new THREE.Group(); knee.position.y = -A; hip.add(knee);
+    knee.add(cap(0.085, B - 0.1, pants));
+    const foot = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.08, 0.26), shoe); foot.position.set(0, -B, 0.07); knee.add(foot);
+    return { hip, knee };
+  };
+  const legs = [makeLeg(-1), makeLeg(1)];
+  const makeArm = side => {
+    const yaw = new THREE.Group(); yaw.position.set(side * 0.3, 0.72, 0); body.add(yaw);
+    const pitch = new THREE.Group(); yaw.add(pitch);
+    pitch.add(cap(0.075, 0.28, shirt));
+    const elbow = new THREE.Group(); elbow.position.y = -0.3; pitch.add(elbow);
+    elbow.add(cap(0.065, 0.24, skin));
+    const hand = new THREE.Mesh(new THREE.SphereGeometry(0.07, 12, 8), skin); hand.position.y = -0.3; elbow.add(hand);
+    return { yaw, pitch, elbow, hand };
+  };
+  const arms = [makeArm(-1), makeArm(1)];
+
+  // 彈力帶
+  const band = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 1, 8), mat(0xe5484d));
+  S.scene.add(band);
+  // 腳踏器
+  const crankC = new THREE.Vector3(0, -0.47, 0.52); // 相對臀部（y 下、z 前）
+  const bike = new THREE.Group(); body.add(bike);
+  const bikeBase = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.06, 0.4), mat(0x444444)); bikeBase.position.set(0, -0.72, crankC.z); bike.add(bikeBase);
+  const post = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.25), mat(0x444444)); post.position.set(0, -0.6, crankC.z); bike.add(post);
+  const crank = new THREE.Group(); crank.position.set(0, crankC.y, crankC.z); bike.add(crank);
+  const disc = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.05, 20), mat(0x888888)); disc.rotation.z = Math.PI / 2; crank.add(disc);
+  const armBar = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.03, 0.3), mat(0x888888)); crank.add(armBar);
+
+  // 2 段 IK：讓腳掌到達 (z, y)，膝蓋往前上彎
+  const ik = (leg, z, y) => {
+    const d = Math.min(A + B - 0.01, Math.max(0.15, Math.hypot(z, y)));
+    const alpha = Math.atan2(z, -y);
+    const phi1 = alpha + Math.acos((A * A + d * d - B * B) / (2 * A * d));
+    const k = Math.acos((A * A + B * B - d * d) / (2 * A * B));
+    leg.hip.rotation.x = -phi1; leg.knee.rotation.x = Math.PI - k;
+  };
+  const vUp = new THREE.Vector3(0, 1, 0), pa = new THREE.Vector3(), pb = new THREE.Vector3();
+
+  let mode = 'raise';
+  S.setMode = m => { mode = m; bike.visible = m === 'bike'; band.visible = m === 'band'; };
+  S.setMode('raise');
+  S.update = (dt, t) => {
+    head.rotation.y = Math.sin(t * 0.7) * 0.12;
+    // 預設坐姿
+    legs.forEach(l => { l.hip.rotation.x = -Math.PI / 2; l.knee.rotation.x = Math.PI / 2; });
+    arms.forEach((a, i) => { a.yaw.rotation.y = 0; a.pitch.rotation.x = -0.15; a.pitch.rotation.z = (i ? -1 : 1) * 0.12; a.elbow.rotation.x = -1.2; });
+    if (mode === 'raise'){
+      const ph = (t % 6) / 6, which = ph < 0.5 ? 0 : 1, local = (ph % 0.5) / 0.5;
+      const lift = Math.sin(Math.min(1, local / 0.8) * Math.PI);
+      legs[which].knee.rotation.x = Math.PI / 2 - lift * (Math.PI / 2 - 0.08);
+      arms.forEach(a => { a.pitch.rotation.x = -0.35; a.elbow.rotation.x = -0.4; a.pitch.rotation.z *= 2.5; });
+    } else if (mode === 'band'){
+      const pull = (Math.sin(t * Math.PI * 2 / 4) + 1) / 2;
+      arms.forEach((a, i) => { const s = i ? -1 : 1;
+        a.pitch.rotation.x = -Math.PI / 2; a.pitch.rotation.z = 0; a.elbow.rotation.x = 0;
+        a.yaw.rotation.y = -s * (0.1 + pull * 0.85); });
+      arms[0].hand.getWorldPosition(pa); arms[1].hand.getWorldPosition(pb);
+      band.position.copy(pa).add(pb).multiplyScalar(0.5);
+      const dir = pb.clone().sub(pa); band.scale.set(1, dir.length(), 1);
+      band.quaternion.setFromUnitVectors(vUp, dir.normalize());
+    } else {
+      const a = t * Math.PI * 2 * 0.7; crank.rotation.x = -a;
+      legs.forEach((l, i) => { const th = a + i * Math.PI;
+        ik(l, crankC.z + Math.cos(th) * 0.15, crankC.y + Math.sin(th) * 0.15); });
+      arms.forEach(a => { a.pitch.rotation.x = -0.6; a.elbow.rotation.x = -0.9; });
+    }
+  };
+  return S;
+}
+
+const EX_TEXT = {
+  raise: '坐姿抬腿：左右輪流，把小腿慢慢伸直再放下（阻力訓練）',
+  band: '彈力帶：雙手往兩側拉開再慢慢收回（阻力訓練）',
+  bike: '固定式腳踏車：坐著輕鬆踩（有氧運動）',
+};
+let exMode = 'raise';
+document.querySelectorAll('[data-ex]').forEach(b => b.addEventListener('click', () => {
+  exMode = b.dataset.ex;
+  document.querySelectorAll('[data-ex]').forEach(x => x.classList.toggle('on', x === b));
+  $('#exBadge').textContent = EX_TEXT[exMode];
+  current?.setMode?.(exMode);
+}));
+
+/* 計時器 */
+const exTimer = { total: 300, left: 300, running: false, last: 0, id: 0 };
+const fmt = s => `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(Math.ceil(s % 60) % 60).padStart(2, '0')}`;
+function exTick(){
+  const now = performance.now(); exTimer.left -= (now - exTimer.last) / 1000; exTimer.last = now;
+  if (exTimer.left <= 0){ exTimer.left = 0; exPause(); speak('時間到，記得做緩和收操。'); toast('時間到！記得收操 🧘'); }
+  $('#exClock').textContent = fmt(Math.max(0, Math.ceil(exTimer.left)));
+}
+function exStart(){ if (exTimer.left <= 0) exTimer.left = exTimer.total; exTimer.running = true; exTimer.last = performance.now();
+  exTimer.id = setInterval(exTick, 250); $('#exStart').textContent = '⏸ 暫停'; speak('開始運動，保持微喘但還能說話。'); }
+function exPause(){ exTimer.running = false; clearInterval(exTimer.id); $('#exStart').textContent = exTimer.left > 0 ? '▶ 繼續' : '▶ 再來一次'; }
+$('#exStart').addEventListener('click', () => exTimer.running ? exPause() : exStart());
+document.querySelectorAll('[data-min]').forEach(b => b.addEventListener('click', () => {
+  exPause(); exTimer.total = exTimer.left = +b.dataset.min * 60;
+  document.querySelectorAll('[data-min]').forEach(x => x.classList.toggle('on', x === b));
+  $('#exClock').textContent = fmt(exTimer.total); $('#exStart').textContent = '▶ 開始';
+}));
+
+/* ================= 場景六：小腿抽筋 ================= */
+function buildCramp(stage){
+  const S = baseScene(stage, new THREE.Vector3(0.4, 1.0, 5.2));
+  S.controls.target.set(0, 0.1, 0);
+  const leg = new THREE.Group(); S.scene.add(leg);
+  const skin = mat(0xe8b896, { transparent: true, opacity: 0.35, depthWrite: false });
+  // 小腿外型（半透明皮膚）
+  const shell = new THREE.Mesh(new THREE.CapsuleGeometry(0.42, 2.4, 8, 24), skin); shell.rotation.z = Math.PI / 2; leg.add(shell);
+  // 脛骨
+  const bone = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.09, 2.7, 16), mat(0xf4efe2));
+  bone.rotation.z = Math.PI / 2; bone.position.set(0, 0.2, 0); leg.add(bone);
+  // 腓腸肌
+  const muscleMat = mat(0xd9646e, { roughness: 0.45 });
+  const muscle = new THREE.Mesh(new THREE.SphereGeometry(0.5, 32, 20), muscleMat);
+  muscle.scale.set(1.9, 0.55, 0.62); muscle.position.set(-0.35, -0.13, 0); leg.add(muscle);
+  // 腳踝與腳掌
+  const ankle = new THREE.Group(); ankle.position.set(1.55, 0, 0); leg.add(ankle);
+  const foot = new THREE.Mesh(new THREE.BoxGeometry(0.4, 1.0, 0.45), mat(0xe8b896)); foot.position.set(0.1, 0.45, 0); ankle.add(foot);
+  const knee = new THREE.Mesh(new THREE.SphereGeometry(0.45, 24, 16), mat(0xe8b896)); knee.position.set(-1.65, 0, 0); leg.add(knee);
+  // 血管
+  const vCurve = new THREE.CatmullRomCurve3([new THREE.Vector3(-1.6, -0.32, 0.25), new THREE.Vector3(-0.4, -0.38, 0.3), new THREE.Vector3(0.8, -0.3, 0.25), new THREE.Vector3(1.5, -0.2, 0.2)]);
+  const vessel = new THREE.Mesh(new THREE.TubeGeometry(vCurve, 40, 0.05, 8), mat(0xb03030, { transparent: true, opacity: 0.6 })); leg.add(vessel);
+  const flow = Array.from({ length: 10 }, () => { const o = new THREE.Mesh(new THREE.SphereGeometry(0.045, 8, 6), new THREE.MeshBasicMaterial({ color: 0xff3b3b })); leg.add(o); return o; });
+  // 脫水水滴
+  const drops = Array.from({ length: 14 }, (_, i) => { const o = new THREE.Mesh(new THREE.SphereGeometry(0.06, 10, 8), mat(0x2a7bd1, { transparent: true }));
+    o.userData = { ph: i / 14, x: -1.1 + Math.random() * 1.6, z: Math.random() * 0.4 - 0.2 }; leg.add(o); return o; });
+  // 電解質
+  const ions = ['Ca', 'Mg', 'K', 'Ca', 'K', 'Mg'].map((t, i) => { const s = labelSprite(t, { bg: ['#f2b705', '#8e5bd1', '#2e8b3d'][i % 3], fg: '#fff', scale: 0.55 });
+    s.userData = { ph: i * 1.3, bx: -1.1 + (i % 3) * 0.6, by: -0.15 + Math.floor(i / 3) * 0.25 }; leg.add(s); return s; });
+  // 熱敷墊、按摩手
+  const pad = new THREE.Mesh(new THREE.CylinderGeometry(0.52, 0.52, 1.5, 32, 1, true), mat(0xff8a3d, { transparent: true, opacity: 0, side: THREE.DoubleSide, emissive: 0xff5a00, emissiveIntensity: 0.5, depthWrite: false }));
+  pad.rotation.z = Math.PI / 2; pad.position.set(-0.35, 0, 0); leg.add(pad);
+  const hand = new THREE.Mesh(new THREE.SphereGeometry(0.22, 20, 14), mat(0xf0c4a2)); hand.scale.set(1.3, 0.6, 1); hand.visible = false; leg.add(hand);
+
+  const labelCramp = labelSprite('抽筋中！', { bg: '#c62828', fg: '#fff', scale: 0.8 }); labelCramp.position.set(-0.4, -0.95, 0.4); labelCramp.visible = false; S.scene.add(labelCramp);
+
+  let cause = null, cramp = 0, target = 0, relief = null, reliefT = 0;
+  S.setCause = c => { cause = c; target = 1; relief = null; };
+  S.setRelief = r => { if (target === 0 && cramp < 0.05) return false; relief = r; reliefT = 0; return true; };
+  const base = new THREE.Color(0xd9646e), hot = new THREE.Color(0x8e1f2a);
+  S.update = (dt, t) => {
+    if (relief){ reliefT += dt; if (reliefT > 1.2) target = 0; if (reliefT > 3.5){ relief = null; cause = null; S.onRelieved?.(); } }
+    cramp += (target - cramp) * Math.min(1, dt * 3);
+    const tw = cramp * (0.85 + 0.15 * Math.sin(t * 25));
+    muscle.scale.set(1.9 - 0.5 * tw, 0.55 + 0.2 * tw, 0.62 + 0.18 * tw);
+    muscle.position.x = -0.35 - 0.15 * tw;
+    muscleMat.color.copy(base).lerp(hot, cramp);
+    const stretch = relief === 'stretch' ? Math.min(1, reliefT / 1) : 0;
+    ankle.rotation.z = -0.9 * cramp + 0.35 * stretch;
+    labelCramp.visible = cramp > 0.5;
+    // 原因動畫
+    drops.forEach(o => { const u = o.userData; o.visible = cause === 'dehydrate';
+      const p = (t * 0.5 + u.ph) % 1; o.position.set(u.x, -0.1 + p * 1.6, u.z); o.material.opacity = 1 - p; });
+    ions.forEach(s => { const u = s.userData; s.visible = cause === 'electrolyte';
+      s.position.set(u.bx + Math.sin(t * 7 + u.ph) * 0.18, u.by + Math.cos(t * 9 + u.ph) * 0.15 + 0.35, 0.5); });
+    const speed = cause === 'lowbp' ? 0.08 : 0.4;
+    flow.forEach((o, i) => { o.visible = cause !== 'lowbp' || i % 3 === 0;
+      o.position.copy(vCurve.getPointAt((t * speed + i / flow.length) % 1)); });
+    vessel.material.opacity = cause === 'lowbp' ? 0.25 : 0.6;
+    // 緩解動畫
+    pad.material.opacity = relief === 'heat' ? Math.min(0.55, reliefT * 0.5) : Math.max(0, pad.material.opacity - dt);
+    hand.visible = relief === 'massage';
+    if (hand.visible) hand.position.set(-0.35 + Math.sin(t * 3) * 0.7, -0.62, 0.15);
+  };
+  return S;
+}
+
+const CAUSE_TEXT = {
+  dehydrate: '💧 脫水速度太快：短時間內移除太多水分，血壓不穩，肌肉就容易抽筋。',
+  electrolyte: '⚡ 電解質不平衡：血中鈣、鎂、鉀等離子濃度變化太大。',
+  lowbp: '📉 低血壓：透析中血壓下降，流到肌肉的血變少，引發抽筋。',
+};
+const RELIEF_TEXT = { heat: '熱敷讓肌肉放鬆了', massage: '輕柔按摩讓肌肉放鬆了', stretch: '適度伸展讓肌肉放鬆了' };
+document.querySelectorAll('[data-cause]').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('[data-cause]').forEach(x => x.classList.toggle('on', x === b));
+  const el = $('#crampCause'); el.hidden = false; el.textContent = CAUSE_TEXT[b.dataset.cause];
+  $('#crampBadge').textContent = '🔴 小腿抽筋了！試試下面的處理方法';
+  current?.setCause?.(b.dataset.cause);
+}));
+document.querySelectorAll('[data-relief]').forEach(b => b.addEventListener('click', () => {
+  if (!current?.setRelief?.(b.dataset.relief)) return toast('先點一個原因，讓小腿抽筋看看');
+  $('#crampBadge').textContent = '🟢 ' + RELIEF_TEXT[b.dataset.relief] + '，記得告訴護理人員';
+}));
+
 /* ================= 路由 ================= */
-const VIEWS = { home:'透析好幫手', dry:'乾體重與水分', fistula:'瘻管照護', er:'何時要立即就醫' };
-const BUILDERS = { dry:buildDry, fistula:buildFistula };
+const VIEWS = { home:'透析好幫手', dry:'乾體重與水分', fistula:'瘻管照護', er:'何時要立即就醫',
+  intro:'認識血液透析', diet:'飲食與用藥', exercise:'運動', cramp:'肌肉抽搐', cardio:'預防心血管疾病' };
+const BUILDERS = { dry:buildDry, fistula:buildFistula, intro:buildIntro, diet:buildDiet, exercise:buildExercise, cramp:buildCramp };
 
 function mountScene(key){
   const stage = $('#stage-'+key);
@@ -672,12 +1341,30 @@ function mountScene(key){
     current.setThrill(thrillOn); current.setListening(listenOn); current.showProp(dontKey);
     current.onVeinTap = () => { current.flash(); setListen(!listenOn); toast(thrillOn ? '有震顫、有呼呼聲，代表血流通暢 👍' : '震顫消失了，要立即就醫！'); };
   }
+  if (key === 'intro') updateUF();
+  if (key === 'diet'){
+    current.onSelect = f => { $('#dietBadge').textContent = `${f.e} ${f.n}：要放哪一籃？`; };
+    current.onResult = (f, right) => {
+      const r = $('#dietResult'); r.hidden = false; r.className = 'result ' + (right ? 'z-green' : 'z-red');
+      r.textContent = (right ? '✅ 答對！' : '❌ 再想想。') + f.e + f.n + '：' + f.why;
+      dietScore();
+      if (right && current.doneCount() === FOODS.length){ $('#dietBadge').textContent = '🎉 全部分類完成！'; toast('全部答對，太棒了！'); }
+      else $('#dietBadge').textContent = right ? '再點下一樣食物' : `${f.e} ${f.n}：換一籃試試`;
+    };
+    dietScore();
+  }
+  if (key === 'exercise') current.setMode(exMode);
+  if (key === 'cramp'){
+    current.onRelieved = () => { document.querySelectorAll('[data-cause]').forEach(x => x.classList.remove('on'));
+      $('#crampBadge').textContent = '點下方原因，看看小腿為什麼會抽筋'; };
+  }
   resize(); startLoop();
 }
 
 function go(key, push = true){
   if (!VIEWS[key]) key = 'home';
   if (current && current.key !== key){ setListen(false); disposeScene(); }
+  if (key !== 'exercise' && exTimer.running) exPause();
   speechSynthesis?.cancel?.();
   document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active', v.id === 'v-'+key));
   $('#title').textContent = VIEWS[key];
@@ -693,7 +1380,7 @@ window.addEventListener('popstate', e=>go(e.state?.key || location.hash.slice(1)
 /* ================= 初始化 ================= */
 $('#callDialysis').href = 'tel:' + CONFIG.DIALYSIS_PHONE.replace(/[^\d+]/g,'');
 $('#callDialysis').innerHTML = `📞 打給透析室<br><span style="font-size:20px">${CONFIG.DIALYSIS_PHONE}</span>`;
-renderRefs(); renderQuiz('dry'); renderQuiz('fistula'); updateWater();
+renderRefs(); ['dry','fistula','intro','diet','exercise','cramp','cardio'].forEach(renderQuiz); updateWater();
 go(location.hash.slice(1) || 'home', false);
 history.replaceState({ key: location.hash.slice(1) || 'home' }, '', location.hash || '#home');
 
