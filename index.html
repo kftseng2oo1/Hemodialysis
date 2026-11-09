@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0f6e74">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="透析衛教">
+<title>透析好幫手｜血液透析衛教</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<style>
+  :root{
+    --bg:#f6f4ef; --card:#ffffff; --ink:#1d2a2b; --muted:#56656a; --line:#dcd8cf;
+    --teal:#0f6e74; --teal-soft:#e2f0f0; --green:#2e8b3d; --yellow:#c98a00; --red:#c62828;
+    --red-soft:#fdecea; --yellow-soft:#fff5d6; --green-soft:#e6f4e8;
+    --safe-b:env(safe-area-inset-bottom,0px); --safe-t:env(safe-area-inset-top,0px);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif;
+    font-size:20px;line-height:1.6;-webkit-text-size-adjust:100%;overscroll-behavior:none}
+  header{position:sticky;top:0;z-index:20;background:var(--teal);color:#fff;
+    padding:calc(10px + var(--safe-t)) 14px 10px;display:flex;align-items:center;gap:10px}
+  header h1{font-size:22px;margin:0;flex:1;font-weight:700}
+  .iconbtn{min-width:48px;min-height:48px;border:0;border-radius:12px;background:rgba(255,255,255,.18);
+    color:#fff;font-size:20px;font-weight:700;padding:0 12px}
+  .iconbtn[hidden]{display:none}
+  main{max-width:760px;margin:0 auto;padding:14px 14px calc(40px + var(--safe-b))}
+  .view{display:none}.view.active{display:block}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px 18px;margin:0 0 14px}
+  .card h2{font-size:23px;margin:0 0 8px}
+  .card h3{font-size:21px;margin:0 0 6px}
+  .card p{margin:6px 0}
+  .muted{color:var(--muted)}
+  ul.big{margin:6px 0;padding-left:1.2em} ul.big li{margin:4px 0}
+  .disclaimer{font-size:17px;color:var(--muted);background:#fff;border:1px dashed var(--line);border-radius:14px;padding:10px 14px;margin-bottom:14px}
+
+  /* 首頁 */
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .unit{border:0;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:18px;
+    padding:16px;min-height:132px;display:flex;flex-direction:column;gap:6px;font:inherit;color:inherit}
+  .unit .emo{font-size:34px;line-height:1}
+  .unit b{font-size:21px}
+  .unit span{font-size:16px;color:var(--muted);line-height:1.4}
+  .unit.hot{border:2px solid var(--teal);background:var(--teal-soft)}
+  .unit.alert{border:2px solid var(--red);background:var(--red-soft)}
+  .unit.soon{opacity:.5}
+  .sectiontitle{font-size:18px;color:var(--muted);margin:18px 4px 8px;font-weight:700}
+
+  /* 3D */
+  .stage{position:relative;height:50vh;min-height:300px;max-height:460px;border-radius:18px;overflow:hidden;
+    background:linear-gradient(#e9f3f3,#d5e6e6);margin-bottom:14px;border:1px solid var(--line)}
+  .stage canvas{display:block;width:100%;height:100%;touch-action:none}
+  .badge{position:absolute;left:12px;top:12px;right:12px;padding:8px 14px;border-radius:14px;font-weight:700;
+    font-size:20px;background:rgba(255,255,255,.92);box-shadow:0 2px 8px rgba(0,0,0,.08);pointer-events:none}
+  .hint{position:absolute;bottom:10px;left:0;right:0;text-align:center;font-size:15px;color:var(--muted);pointer-events:none}
+
+  /* 表單 */
+  label.row{display:flex;align-items:center;gap:10px;margin:10px 0;flex-wrap:wrap}
+  label.row > span{min-width:4.6em;font-weight:700}
+  input[type=number]{font:inherit;font-size:22px;width:5.2em;padding:8px 12px;border:2px solid var(--line);border-radius:12px;background:#fff}
+  input[type=range]{width:100%;height:44px;accent-color:var(--teal)}
+  .result{border-radius:14px;padding:12px 14px;margin-top:10px;font-size:20px}
+  .z-green{background:var(--green-soft);border:2px solid var(--green)}
+  .z-yellow{background:var(--yellow-soft);border:2px solid var(--yellow)}
+  .z-red{background:var(--red-soft);border:2px solid var(--red)}
+  .num{font-size:28px;font-weight:800}
+  .btn{font:inherit;font-weight:700;min-height:52px;border-radius:14px;border:2px solid var(--teal);
+    background:#fff;color:var(--teal);padding:8px 14px}
+  .btn.primary{background:var(--teal);color:#fff}
+  .btn.on{background:var(--red);border-color:var(--red);color:#fff}
+  .btnrow{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
+  .speak{float:right;min-height:44px;font-size:16px;padding:4px 12px;border-radius:12px;border:1px solid var(--line);background:#fff;color:var(--teal);font-weight:700}
+
+  table.simple{width:100%;border-collapse:collapse;font-size:17px}
+  table.simple th,table.simple td{border-top:1px solid var(--line);padding:8px 6px;vertical-align:top;text-align:left}
+  table.simple th{background:#f2efe8}
+
+  /* 測驗 */
+  .q{margin:12px 0 16px}
+  .q p{font-weight:700}
+  .opt{display:block;width:100%;text-align:left;font:inherit;margin:6px 0;padding:10px 14px;border-radius:14px;
+    border:2px solid var(--line);background:#fff;min-height:52px}
+  .opt.right{border-color:var(--green);background:var(--green-soft)}
+  .opt.wrong{border-color:var(--red);background:var(--red-soft)}
+  .explain{font-size:18px;padding:8px 12px;border-radius:12px;background:#f2efe8;margin-top:6px}
+
+  /* 就醫 */
+  .callbtn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:76px;
+    border-radius:20px;background:var(--red);color:#fff;font-size:26px;font-weight:800;text-decoration:none;margin:4px 0 12px}
+  .callbtn.alt{background:#fff;color:var(--red);border:3px solid var(--red);font-size:22px;min-height:64px}
+  .alertlist li{font-size:22px;font-weight:700;margin:8px 0}
+  .refs{font-size:15px;color:var(--muted);word-break:break-all}
+  .refs li{margin:4px 0}
+  .toast{position:fixed;left:50%;bottom:calc(20px + var(--safe-b));transform:translateX(-50%);background:#1d2a2b;color:#fff;
+    padding:10px 18px;border-radius:14px;font-size:18px;z-index:50;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90vw}
+  .toast.show{opacity:1}
+</style>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<header>
+  <button class="iconbtn" id="backBtn" hidden aria-label="回首頁">‹ 首頁</button>
+  <h1 id="title">透析好幫手</h1>
+</header>
+
+<main>
+  <!-- ========== 首頁 ========== -->
+  <section class="view active" id="v-home">
+    <div class="disclaimer">本內容僅供衛教參考，實際以醫療團隊指示為準。</div>
+    <div class="grid">
+      <button class="unit hot" data-go="dry"><span class="emo">💧</span><b>乾體重與水分</b><span>水球人：體重增加多少才安全？</span></button>
+      <button class="unit hot" data-go="fistula"><span class="emo">💪</span><b>瘻管照護</b><span>摸摸看、聽聽看，哪些事不能做</span></button>
+      <button class="unit alert" data-go="er" style="grid-column:1/-1"><span class="emo">🚨</span><b>何時要立即就醫</b><span>出現這些情況，馬上打電話</span></button>
+    </div>
+    <div class="sectiontitle">即將推出</div>
+    <div class="grid">
+      <div class="unit soon"><span class="emo">🩸</span><b>認識血液透析</b><span>透析器怎麼幫你清血</span></div>
+      <div class="unit soon"><span class="emo">🍽️</span><b>飲食與用藥</b><span>低磷、低鉀、限鈉</span></div>
+      <div class="unit soon"><span class="emo">🚶</span><b>運動</b><span>每次 20–30 分鐘</span></div>
+      <div class="unit soon"><span class="emo">🦵</span><b>肌肉抽搐</b><span>為什麼會抽筋</span></div>
+    </div>
+  </section>
+
+  <!-- ========== 乾體重 ========== -->
+  <section class="view" id="v-dry">
+    <div class="stage" id="stage-dry"><div class="badge" id="dryBadge">拖動下方滑桿，看看水球人</div><div class="hint">可用手指旋轉</div></div>
+
+    <div class="card">
+      <h2>算算看：今天體重增加多少？</h2>
+      <label class="row"><span>乾體重</span><input type="number" id="dryW" inputmode="decimal" step="0.1" min="25" max="200" value="60"> 公斤</label>
+      <label class="row"><span>今天體重</span><input type="number" id="nowW" inputmode="decimal" step="0.1" min="25" max="220" value="61.2"> 公斤</label>
+      <input type="range" id="gainRange" min="0" max="8" step="0.1" value="2" aria-label="體重增加百分比">
+      <div class="result z-green" id="dryResult"></div>
+    </div>
+
+    <div class="card">
+      <button class="speak" data-speak="dryWhat">🔊 唸給我聽</button>
+      <h2>什麼是乾體重？</h2>
+      <p id="dryWhat">乾體重是透析結束時，身體最舒服、沒有多餘水分、血壓穩定的理想體重。這時候不水腫、呼吸順暢。兩次透析之間，體重增加要維持在乾體重的百分之三到五以內。</p>
+      <ul class="big">
+        <li>每天清晨上完廁所、吃東西前量體重</li>
+        <li>穿差不多重量的衣服量，才準確</li>
+        <li>乾體重會隨營養狀況改變，常抽筋或血壓太低要告訴醫護人員</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2>今天可以喝多少水？</h2>
+      <label class="row"><span>昨天尿量</span><input type="number" id="urine" inputmode="numeric" step="50" min="0" max="3000" value="300"> 毫升</label>
+      <div class="result z-green" id="waterResult"></div>
+      <p class="muted" style="font-size:17px">公式：前一日尿量＋700 毫升。湯、稀飯、麵條、水果裡的水分也要算進去。</p>
+      <ul class="big">
+        <li>口渴時含小冰塊或檸檬片</li>
+        <li>用固定容量的小杯子，少量多次</li>
+        <li>不要吃太鹹，否則會一直想喝水</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2>乾體重可能需要調整的情況</h2>
+      <p class="muted" style="font-size:17px">出現下列情形，請告訴醫護人員評估，不要自己改。</p>
+      <table class="simple">
+        <tr><th>可能要調高</th><th>可能要調低</th></tr>
+        <tr><td>透析後段容易抽筋</td><td>血壓很高</td></tr>
+        <tr><td>透析後段容易掉血壓</td><td>水腫</td></tr>
+        <tr><td>結束後聲音沙啞</td><td>爬樓梯、走路容易喘</td></tr>
+        <tr><td>結束後耳鳴、頭暈</td><td>晚上躺下會喘、會咳</td></tr>
+        <tr><td>結束後異常疲累、血壓很低</td><td>胸悶</td></tr>
+      </table>
+    </div>
+
+    <div class="card"><h2>小測驗</h2><div id="quiz-dry"></div></div>
+    <div class="card"><h3>參考資料</h3><ol class="refs" id="refs-dry"></ol></div>
+  </section>
+
+  <!-- ========== 瘻管 ========== -->
+  <section class="view" id="v-fistula">
+    <div class="stage" id="stage-fistula"><div class="badge" id="fisBadge">點一下手臂上的瘻管，聽聽「呼呼聲」</div><div class="hint">可用手指旋轉</div></div>
+
+    <div class="card">
+      <h2>每天早晚檢查一次</h2>
+      <p>用手輕摸，或用聽診器聽。摸到「震顫感」、聽到「呼呼聲」就是正常。</p>
+      <div class="btnrow">
+        <button class="btn primary" id="btnListen">🔊 聽呼呼聲</button>
+        <button class="btn" id="btnStop">模擬震顫消失</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>瘻管這一側，不能做這些事</h2>
+      <p class="muted" style="font-size:17px">點按鈕，看看會發生什麼事。</p>
+      <div class="btnrow" id="dontBtns">
+        <button class="btn" data-dont="bp">量血壓</button>
+        <button class="btn" data-dont="blood">抽血</button>
+        <button class="btn" data-dont="heavy">提重物</button>
+        <button class="btn" data-dont="watch">戴手錶、飾品</button>
+        <button class="btn" data-dont="pillow">睡覺當枕頭壓</button>
+        <button class="btn" data-dont="tight">穿太緊的衣服</button>
+      </div>
+      <div class="result z-red" id="dontResult" hidden></div>
+    </div>
+
+    <div class="card">
+      <button class="speak" data-speak="fisCare">🔊 唸給我聽</button>
+      <h2>保持清潔、注意感染</h2>
+      <p id="fisCare">穿刺部位要保持清潔乾燥。如果出現紅、腫、熱、痛或有分泌物，要盡快回診。用導管的人，導管也要保持乾燥清潔，避免感染。透析後針孔要加壓止血約十到十五分鐘。</p>
+    </div>
+
+    <div class="card"><h2>小測驗</h2><div id="quiz-fistula"></div></div>
+    <div class="card"><h3>參考資料</h3><ol class="refs" id="refs-fistula"></ol></div>
+  </section>
+
+  <!-- ========== 就醫 ========== -->
+  <section class="view" id="v-er">
+    <a class="callbtn" id="callDialysis" href="#">📞 打給透析室</a>
+    <a class="callbtn alt" href="tel:119">🚑 撥打 119</a>
+    <div class="card" style="border:2px solid var(--red)">
+      <button class="speak" data-speak="erList">🔊 唸給我聽</button>
+      <h2 style="color:var(--red)">出現下列情形，請立即就醫</h2>
+      <ul class="alertlist" id="erList">
+        <li>呼吸困難、喘、胸痛、胸悶、心悸</li>
+        <li>發燒或疑似感染</li>
+        <li>瘻管摸不到震顫、聽不到呼呼聲</li>
+        <li>意識改變、嚴重頭暈或昏迷</li>
+        <li>出血一直止不住</li>
+        <li>體重快速上升、明顯水腫</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h2>透析後常見不適</h2>
+      <table class="simple">
+        <tr><th>不適</th><th>怎麼辦</th></tr>
+        <tr><td>頭暈、低血壓</td><td>平躺、抬高雙腳，告訴醫護人員</td></tr>
+        <tr><td>抽筋</td><td>適度伸展、熱敷，告訴醫護人員</td></tr>
+        <tr><td>噁心、疲倦</td><td>休息並觀察變化</td></tr>
+        <tr><td>穿刺處出血</td><td>持續加壓；止不住要立即就醫</td></tr>
+      </table>
+      <p class="muted" style="font-size:17px">下床要慢慢起身；透析當天不要提重物或劇烈運動。</p>
+    </div>
+    <div class="card"><h3>參考資料</h3><ol class="refs" id="refs-er"></ol></div>
+  </section>
+</main>
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+/* ================= 設定（統一採用的數據） ================= */
+const CONFIG = {
+  DIALYSIS_PHONE: '037-670785',  // 透析室電話（寫死）
+  WATER_EXTRA_ML: 700,            // 每日飲水 = 前一日尿量 + 700 mL
+  GAIN_LOW: 3, GAIN_HIGH: 5,      // 透析間體重增加：乾體重 3–5%
+};
+
+const REFS = {
+  dry: [
+    '台灣腎臟醫學會（2023）．《血液透析臨床照護指引》．https://www.tsn.org.tw/',
+    '台灣腎臟醫學會（編）（2025）．台灣血液透析臨床診療指引．',
+    '衛生福利部國民健康署（2022）．《慢性腎臟病健康照護手冊》．https://www.hpa.gov.tw/',
+  ],
+  fistula: [
+    '台灣腎臟醫學會（2023）．《血液透析臨床照護指引》．https://www.tsn.org.tw/',
+    '衛生福利部國民健康署（2022）．《慢性腎臟病健康照護手冊》．https://www.hpa.gov.tw/',
+    '衛生福利部（2023）．《慢性腎臟病防治手冊》．',
+  ],
+  er: [
+    '台灣腎臟醫學會（2023）．《血液透析臨床照護指引》．https://www.tsn.org.tw/',
+    '衛生福利部國民健康署（2022）．《慢性腎臟病健康照護手冊》．https://www.hpa.gov.tw/',
+  ],
+};
+
+const QUIZ = {
+  dry: [
+    { q:'乾體重 60 公斤，兩次透析之間體重最好不要超過多少？', o:['61.8–63 公斤','65 公斤','66 公斤'], a:0,
+      e:'增加量維持在乾體重的 3–5%：60×3%＝1.8 公斤，60×5%＝3 公斤，所以是 61.8–63 公斤。' },
+    { q:'昨天尿量 300 毫升，今天大約可以喝多少水？', o:['300 毫升','1000 毫升','2000 毫升'], a:1,
+      e:'前一日尿量＋700 毫升：300＋700＝1000 毫升，湯和稀飯也要算進去。' },
+    { q:'量體重最好的時間是？', o:['晚餐後','清晨上完廁所、吃東西前','洗完澡後'], a:1,
+      e:'每天同一時間、穿差不多的衣服量，才比得出變化。' },
+  ],
+  fistula: [
+    { q:'摸瘻管時，正常應該是？', o:['完全沒感覺','有震顫感、呼呼聲','會痛才正常'], a:1,
+      e:'有震顫感（thrill）和呼呼聲代表血流通暢；變弱或消失要立即就醫。' },
+    { q:'下列哪一件事可以在瘻管那隻手做？', o:['量血壓','提重物','輕輕觸摸檢查'], a:2,
+      e:'瘻管側不能量血壓、抽血、提重物或長時間壓迫，只能輕摸檢查。' },
+    { q:'瘻管附近紅、腫、熱、痛，應該？', o:['自己擦藥就好','等下次透析再說','盡快回診'], a:2,
+      e:'紅腫熱痛可能是感染，要盡快讓醫護人員評估。' },
+  ],
+};
+
+/* ================= 共用工具 ================= */
+const $ = s => document.querySelector(s);
+const toastEl = $('#toast');
+function toast(msg){ toastEl.textContent = msg; toastEl.classList.add('show'); clearTimeout(toast.t); toast.t = setTimeout(()=>toastEl.classList.remove('show'), 2400); }
+
+function renderRefs(){ for (const k in REFS){ const ol = $('#refs-'+k); if (ol) ol.innerHTML = REFS[k].map(r=>`<li>${r}</li>`).join(''); } }
+function renderQuiz(key){
+  const box = $('#quiz-'+key);
+  box.innerHTML = QUIZ[key].map((it,i)=>`<div class="q" data-i="${i}"><p>${i+1}. ${it.q}</p>${it.o.map((o,j)=>`<button class="opt" data-j="${j}">${o}</button>`).join('')}<div class="explain" hidden></div></div>`).join('');
+  box.querySelectorAll('.q').forEach(qEl=>{
+    const it = QUIZ[key][+qEl.dataset.i];
+    qEl.querySelectorAll('.opt').forEach(b=>b.addEventListener('click',()=>{
+      qEl.querySelectorAll('.opt').forEach(x=>x.classList.remove('right','wrong'));
+      const j = +b.dataset.j;
+      qEl.querySelectorAll('.opt')[it.a].classList.add('right');
+      if (j !== it.a) b.classList.add('wrong');
+      const ex = qEl.querySelector('.explain'); ex.hidden = false;
+      ex.textContent = (j === it.a ? '答對了！' : '正確答案已標示。') + it.e;
+    }));
+  });
+}
+
+/* 語音：先用系統 zh-TW 語音，之後可換 tts-studio 預錄 mp3 */
+function speak(text){
+  if (!('speechSynthesis' in window)) return toast('這台裝置不支援朗讀');
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'zh-TW'; u.rate = 0.9;
+  const v = speechSynthesis.getVoices().find(v=>/zh[-_]TW/i.test(v.lang));
+  if (v) u.voice = v;
+  speechSynthesis.speak(u);
+}
+document.querySelectorAll('[data-speak]').forEach(b=>b.addEventListener('click',()=>speak($('#'+b.dataset.speak).innerText)));
+
+/* Web Audio：iOS 需在使用者點擊後解鎖 */
+let actx = null;
+function audio(){
+  if (!actx){ const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return null; actx = new AC(); }
+  if (actx.state === 'suspended') actx.resume();
+  return actx;
+}
+document.addEventListener('pointerdown', ()=>audio(), { once:true });
+
+/* ================= three.js 共用 renderer ================= */
+let renderer = null, current = null, rafId = 0, running = false;
+const clock = new THREE.Clock();
+
+function ensureRenderer(){
+  if (renderer) return renderer;
+  renderer = new THREE.WebGLRenderer({ antialias:true, alpha:true, powerPreference:'low-power' });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  const c = renderer.domElement;
+  c.addEventListener('webglcontextlost', e=>{ e.preventDefault(); stopLoop(); });
+  c.addEventListener('webglcontextrestored', ()=>{ const v = current; disposeScene(); if (v) mountScene(v.key); });
+  return renderer;
+}
+
+function resize(){
+  if (!current) return;
+  const el = current.stage; const w = el.clientWidth, h = el.clientHeight;
+  renderer.setSize(w, h, false);
+  current.camera.aspect = w / h; current.camera.updateProjectionMatrix();
+}
+window.addEventListener('resize', resize);
+
+function loop(){
+  if (!running) return;
+  rafId = requestAnimationFrame(loop);
+  const dt = Math.min(clock.getDelta(), 0.05), t = clock.elapsedTime;
+  current.update?.(dt, t);
+  current.controls.update();
+  renderer.render(current.scene, current.camera);
+}
+function startLoop(){ if (running || !current) return; running = true; clock.getDelta(); loop(); }
+function stopLoop(){ running = false; cancelAnimationFrame(rafId); }
+document.addEventListener('visibilitychange', ()=> document.hidden ? stopLoop() : startLoop());
+
+function baseScene(stage, camPos){
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 100);
+  camera.position.copy(camPos);
+  scene.add(new THREE.HemisphereLight(0xffffff, 0xb8c9c9, 1.1));
+  const dl = new THREE.DirectionalLight(0xffffff, 1.4); dl.position.set(3,5,4); scene.add(dl);
+  const floor = new THREE.Mesh(new THREE.CircleGeometry(3.2, 48), new THREE.MeshStandardMaterial({ color:0xc3d7d6, roughness:1 }));
+  floor.rotation.x = -Math.PI/2; floor.position.y = -1.6; scene.add(floor);
+  const controls = new OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true; controls.enablePan = false; controls.enableZoom = false;
+  controls.minPolarAngle = Math.PI*0.25; controls.maxPolarAngle = Math.PI*0.55;
+  stage.prepend(renderer.domElement);
+  return { scene, camera, controls, stage };
+}
+
+function disposeScene(){
+  if (!current) return;
+  stopLoop();
+  current.cleanup?.();
+  current.controls.dispose();
+  current.scene.traverse(o=>{
+    o.geometry?.dispose();
+    const m = o.material; if (m) (Array.isArray(m) ? m : [m]).forEach(mm=>{ mm.map?.dispose(); mm.dispose(); });
+  });
+  current = null;
+}
+
+/* ================= 場景一：乾體重水球人 ================= */
+function zoneOf(p){ return p < CONFIG.GAIN_LOW ? 'green' : (p <= CONFIG.GAIN_HIGH ? 'yellow' : 'red'); }
+const ZONE_COLOR = { green:new THREE.Color(0x4caf50), yellow:new THREE.Color(0xf2b705), red:new THREE.Color(0xe53935) };
+
+function buildDry(stage){
+  const S = baseScene(stage, new THREE.Vector3(0, 0.9, 7.6));
+  S.controls.target.set(0, 0.05, 0);
+  const water = new THREE.MeshPhysicalMaterial({ color:0x4caf50, roughness:0.15, metalness:0, clearcoat:1, transparent:true, opacity:0.82 });
+  const g = new THREE.Group(); S.scene.add(g);
+  const body = new THREE.Mesh(new THREE.SphereGeometry(0.85, 40, 28), water); body.position.y = 0; g.add(body);
+  const head = new THREE.Mesh(new THREE.SphereGeometry(0.48, 32, 24), water); head.position.y = 1.25; g.add(head);
+  const limbGeo = new THREE.CapsuleGeometry(0.17, 0.75, 6, 16);
+  const limbs = [
+    [-0.95, 0.15, 0.6], [0.95, 0.15, -0.6],  // 手
+    [-0.35, -1.05, 0.05], [0.35, -1.05, -0.05] // 腳
+  ].map(([x,y,rz])=>{ const m = new THREE.Mesh(limbGeo, water); m.position.set(x,y,0); m.rotation.z = rz; g.add(m); return m; });
+  // 表情
+  const eyeMat = new THREE.MeshBasicMaterial({ color:0x1d2a2b });
+  const eyeGeo = new THREE.SphereGeometry(0.05, 12, 8);
+  const eyes = [-0.16, 0.16].map(x=>{ const e = new THREE.Mesh(eyeGeo, eyeMat); e.position.set(x, 1.32, 0.44); g.add(e); return e; });
+  const mouth = new THREE.Mesh(new THREE.TorusGeometry(0.12, 0.022, 8, 24, Math.PI), eyeMat);
+  mouth.position.set(0, 1.15, 0.45); g.add(mouth);
+  // 裡面的水位
+  const level = new THREE.Mesh(new THREE.SphereGeometry(0.6, 24, 16, 0, Math.PI*2, Math.PI*0.45, Math.PI*0.55),
+    new THREE.MeshStandardMaterial({ color:0x2a7bd1, transparent:true, opacity:0.45 }));
+  g.add(level);
+
+  let target = 2, shown = 2;
+  S.setGain = p => { target = p; };
+  S.update = (dt, t) => {
+    shown += (target - shown) * Math.min(1, dt*6);
+    const p = shown, swell = 1 + p * 0.07;
+    body.scale.setScalar(swell);
+    head.scale.setScalar(1 + p*0.025);
+    head.position.y = 1.25 + (swell-1)*0.85;
+    eyes.forEach(e=>e.position.y = head.position.y + 0.07);
+    mouth.position.y = head.position.y - 0.1;
+    // 超標時嘴巴往下
+    const sad = zoneOf(p) === 'red';
+    mouth.rotation.z = sad ? 0 : Math.PI;
+    mouth.position.y += sad ? -0.08 : 0.04;
+    limbs.forEach((m,i)=>{ const s = 1 + p*0.05; m.scale.set(s, 1, s); m.position.x = Math.sign(m.position.x) * (i<2 ? 0.95*swell : 0.35); });
+    level.scale.setScalar(0.6 + p*0.09);
+    // 顏色：綠→黃→紅
+    const c = p < CONFIG.GAIN_LOW ? ZONE_COLOR.green.clone().lerp(ZONE_COLOR.yellow, p/CONFIG.GAIN_LOW*0.35)
+            : p <= CONFIG.GAIN_HIGH ? ZONE_COLOR.yellow.clone()
+            : ZONE_COLOR.yellow.clone().lerp(ZONE_COLOR.red, Math.min(1,(p-CONFIG.GAIN_HIGH)/1.2));
+    water.color.copy(c);
+    // 水球晃動
+    const wob = Math.sin(t*2.2) * 0.015 * (1 + p*0.3);
+    g.scale.set(1+wob, 1-wob, 1+wob);
+    g.rotation.y = Math.sin(t*0.5)*0.25;
+  };
+  return S;
+}
+
+function updateDryUI(from){
+  const dry = parseFloat($('#dryW').value);
+  let now = parseFloat($('#nowW').value);
+  const range = $('#gainRange');
+  if (!(dry > 0)) return;
+  if (from === 'range'){ now = +(dry * (1 + range.value/100)).toFixed(1); $('#nowW').value = now; }
+  const gainKg = now - dry, p = gainKg / dry * 100;
+  if (from !== 'range') range.value = Math.max(0, Math.min(8, p));
+  const lo = dry * CONFIG.GAIN_LOW/100, hi = dry * CONFIG.GAIN_HIGH/100;
+  const z = zoneOf(Math.max(0,p));
+  const res = $('#dryResult');
+  res.className = 'result z-' + z;
+  const msg = {
+    green: '✅ 在安全範圍內，繼續保持！',
+    yellow: '⚠️ 已在上限範圍，接下來少喝水、少吃鹹。',
+    red: '⛔ 超過上限！水分太多會水腫、喘、血壓升高，加重心臟負擔；透析時要脫水較多，也容易抽筋、掉血壓。'
+  }[z];
+  res.innerHTML = `增加 <span class="num">${gainKg.toFixed(1)}</span> 公斤（${p.toFixed(1)}%）<br>`
+    + `上限範圍：${lo.toFixed(1)}–${hi.toFixed(1)} 公斤（體重 ${(dry+lo).toFixed(1)}–${(dry+hi).toFixed(1)} 公斤）<br>${msg}`;
+  $('#dryBadge').textContent = { green:'🟢 綠燈：安全', yellow:'🟡 黃燈：快到上限', red:'🔴 紅燈：超過上限' }[z];
+  current?.setGain?.(Math.max(0, Math.min(8, p)));
+}
+function updateWater(){
+  const u = Math.max(0, parseFloat($('#urine').value) || 0);
+  $('#waterResult').innerHTML = `今天約可喝 <span class="num">${u + CONFIG.WATER_EXTRA_ML}</span> 毫升<br><span style="font-size:17px">大約是 ${Math.round((u + CONFIG.WATER_EXTRA_ML)/150)} 小杯（每杯 150 毫升）</span>`;
+}
+$('#dryW').addEventListener('input', ()=>updateDryUI('input'));
+$('#nowW').addEventListener('input', ()=>updateDryUI('input'));
+$('#gainRange').addEventListener('input', ()=>updateDryUI('range'));
+$('#urine').addEventListener('input', updateWater);
+
+/* ================= 場景二：瘻管手臂 ================= */
+function makeXSprite(){
+  const c = document.createElement('canvas'); c.width = c.height = 128;
+  const x = c.getContext('2d');
+  x.fillStyle = '#ffffff'; x.beginPath(); x.arc(64,64,58,0,Math.PI*2); x.fill();
+  x.strokeStyle = '#c62828'; x.lineWidth = 10; x.beginPath(); x.arc(64,64,52,0,Math.PI*2); x.stroke();
+  x.lineWidth = 16; x.lineCap = 'round';
+  x.beginPath(); x.moveTo(38,38); x.lineTo(90,90); x.moveTo(90,38); x.lineTo(38,90); x.stroke();
+  const tex = new THREE.CanvasTexture(c); tex.colorSpace = THREE.SRGBColorSpace;
+  const s = new THREE.Sprite(new THREE.SpriteMaterial({ map:tex, depthTest:false }));
+  s.scale.set(0.5,0.5,1); s.renderOrder = 10;
+  return s;
+}
+
+function buildFistula(stage){
+  const S = baseScene(stage, new THREE.Vector3(0.3, 4.6, 6.0));
+  S.controls.target.set(0.3, -0.1, 0);
+  const skin = new THREE.MeshStandardMaterial({ color:0xe8b896, roughness:0.75 });
+  const arm = new THREE.Group(); S.scene.add(arm);
+  // 上臂（左）+ 手肘 + 前臂（右）+ 手掌
+  const upper = new THREE.Mesh(new THREE.CapsuleGeometry(0.36, 1.5, 8, 24), skin);
+  upper.rotation.z = Math.PI/2; upper.position.set(-1.25, 0, 0); arm.add(upper);
+  const fore = new THREE.Mesh(new THREE.CapsuleGeometry(0.3, 1.7, 8, 24), skin);
+  fore.rotation.z = Math.PI/2; fore.position.set(0.85, -0.02, 0); arm.add(fore);
+  const hand = new THREE.Mesh(new THREE.SphereGeometry(0.34, 24, 16), skin);
+  hand.scale.set(1.25, 0.55, 0.9); hand.position.set(2.15, -0.05, 0); arm.add(hand);
+  arm.position.y = 0;
+
+  // 瘻管：前臂上方隆起的血管
+  const curve = new THREE.CatmullRomCurve3([
+    new THREE.Vector3(1.75, 0.22, 0.12), new THREE.Vector3(1.3, 0.3, 0.06),
+    new THREE.Vector3(0.8, 0.33, 0.02), new THREE.Vector3(0.3, 0.31, -0.04),
+    new THREE.Vector3(-0.15, 0.27, -0.05)
+  ]);
+  const veinMat = new THREE.MeshStandardMaterial({ color:0x7a3a8c, roughness:0.4, emissive:0x3a0a40, emissiveIntensity:0.4 });
+  const vein = new THREE.Mesh(new THREE.TubeGeometry(curve, 60, 0.075, 12, false), veinMat);
+  arm.add(vein);
+  // 流動光點（血流）
+  const dots = [];
+  const dotMat = new THREE.MeshBasicMaterial({ color:0xff6f91, transparent:true, opacity:0.9 });
+  for (let i=0;i<6;i++){ const d = new THREE.Mesh(new THREE.SphereGeometry(0.05, 10, 8), dotMat); arm.add(d); dots.push(d); }
+  // 點擊判定用的較粗隱形管
+  const hit = new THREE.Mesh(new THREE.TubeGeometry(curve, 30, 0.22, 8, false), new THREE.MeshBasicMaterial({ visible:false }));
+  arm.add(hit);
+
+  // 禁止事項的道具
+  const props = new THREE.Group(); arm.add(props);
+  const xs = makeXSprite(); xs.visible = false; arm.add(xs);
+  function clearProps(){ while(props.children.length){ const o = props.children.pop(); o.traverse(m=>{ m.geometry?.dispose(); m.material?.dispose?.(); }); } xs.visible = false; }
+  function std(c){ return new THREE.MeshStandardMaterial({ color:c, roughness:0.6 }); }
+  const PROPS = {
+    bp(){ const g = new THREE.Group();
+      const cuff = new THREE.Mesh(new THREE.CylinderGeometry(0.46,0.46,0.6,32,1,true), std(0x2f5d9b)); cuff.material.side = THREE.DoubleSide;
+      cuff.rotation.z = Math.PI/2; cuff.position.set(0.55,0,0); g.add(cuff);
+      const tube = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3([new THREE.Vector3(0.55,0.45,0),new THREE.Vector3(0.6,1.0,0.3),new THREE.Vector3(0.2,1.3,0.6)]),20,0.03,6), std(0x222222)); g.add(tube);
+      return [g, new THREE.Vector3(0.55, 0.85, 0.3)]; },
+    blood(){ const g = new THREE.Group();
+      const barrel = new THREE.Mesh(new THREE.CylinderGeometry(0.08,0.08,0.7,16), new THREE.MeshStandardMaterial({ color:0xddeeff, transparent:true, opacity:0.7 }));
+      const needle = new THREE.Mesh(new THREE.CylinderGeometry(0.012,0.012,0.4,8), std(0xaaaaaa)); needle.position.y = -0.55;
+      g.add(barrel, needle); g.position.set(0.5, 1.0, 0.1); g.rotation.z = -0.5; return [g, new THREE.Vector3(0.5, 1.15, 0.3)]; },
+    heavy(){ const g = new THREE.Group();
+      const bag = new THREE.Mesh(new THREE.BoxGeometry(0.6,0.7,0.35), std(0x8a5a2b)); bag.position.set(2.2,-1.0,0);
+      const handle = new THREE.Mesh(new THREE.TorusGeometry(0.16,0.03,8,20,Math.PI), std(0x333333)); handle.position.set(2.2,-0.62,0);
+      g.add(bag, handle); return [g, new THREE.Vector3(2.2, -0.2, 0.4)]; },
+    watch(){ const g = new THREE.Group();
+      const band = new THREE.Mesh(new THREE.TorusGeometry(0.33,0.05,10,32), std(0x333333)); band.rotation.y = Math.PI/2; band.position.set(1.72,-0.02,0);
+      const face = new THREE.Mesh(new THREE.CylinderGeometry(0.12,0.12,0.05,24), std(0xd4af37)); face.position.set(1.72,0.35,0);
+      g.add(band, face); return [g, new THREE.Vector3(1.72, 0.8, 0.3)]; },
+    pillow(){ const g = new THREE.Group();
+      const p = new THREE.Mesh(new THREE.SphereGeometry(0.5,24,16), std(0xf3efe6)); p.scale.set(1.8,0.45,1.1); p.position.set(0.6,0.62,0);
+      const head = new THREE.Mesh(new THREE.SphereGeometry(0.42,24,16), std(0xe8b896)); head.position.set(0.6,1.15,0);
+      g.add(p, head); return [g, new THREE.Vector3(1.45, 1.05, 0.4)]; },
+    tight(){ const g = new THREE.Group();
+      const sleeve = new THREE.Mesh(new THREE.CylinderGeometry(0.33,0.34,1.3,32,1,true), std(0x4f7a52)); sleeve.material.side = THREE.DoubleSide;
+      sleeve.rotation.z = Math.PI/2; sleeve.position.set(0.6,0,0); g.add(sleeve);
+      return [g, new THREE.Vector3(0.6, 0.75, 0.3)]; },
+  };
+  S.showProp = key => { clearProps(); if (!key) return; const [g, xpos] = PROPS[key](); props.add(g); xs.position.copy(xpos); xs.visible = true; };
+
+  // 狀態
+  let thrill = true, listening = false, flash = 0;
+  S.setThrill = on => { thrill = on; veinMat.color.set(on ? 0x7a3a8c : 0x6b6b6b); veinMat.emissiveIntensity = on ? 0.4 : 0; dots.forEach(d=>d.visible = on); };
+  S.setListening = on => { listening = on; };
+  S.flash = () => { flash = 1; };
+
+  // 點擊瘻管
+  const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
+  let downAt = null;
+  const el = renderer.domElement;
+  const onDown = e => { downAt = [e.clientX, e.clientY]; };
+  const onUp = e => {
+    if (!downAt || Math.hypot(e.clientX-downAt[0], e.clientY-downAt[1]) > 8) return;
+    const r = el.getBoundingClientRect();
+    ndc.set(((e.clientX-r.left)/r.width)*2-1, -((e.clientY-r.top)/r.height)*2+1);
+    ray.setFromCamera(ndc, S.camera);
+    if (ray.intersectObject(hit).length) S.onVeinTap?.();
+  };
+  el.addEventListener('pointerdown', onDown); el.addEventListener('pointerup', onUp);
+  S.cleanup = () => { el.removeEventListener('pointerdown', onDown); el.removeEventListener('pointerup', onUp); stopThrillSound(); };
+
+  S.update = (dt, t) => {
+    const beat = thrill ? Math.max(0, Math.sin(t*Math.PI*2*1.1)) ** 3 : 0;
+    const s = 1 + beat * (listening ? 0.35 : 0.18);
+    vein.scale.set(1, s, s); vein.position.y = -(s-1)*0.3;
+    dots.forEach((d,i)=>{ const u = ((t*0.35 + i/dots.length) % 1); const p = curve.getPointAt(1-u); d.position.copy(p); d.position.y += 0.02; });
+    if (flash > 0){ flash = Math.max(0, flash - dt*1.5); veinMat.emissive.setRGB(0.23+flash*0.6, 0.04+flash*0.5, 0.25+flash*0.2); }
+    if (xs.visible) xs.scale.setScalar(0.5 + Math.sin(t*4)*0.03);
+  };
+  return S;
+}
+
+/* 呼呼聲：濾波噪音＋隨心跳起伏 */
+let thrillNodes = null;
+function startThrillSound(){
+  const ac = audio(); if (!ac || thrillNodes) return;
+  const len = ac.sampleRate * 2, buf = ac.createBuffer(1, len, ac.sampleRate), d = buf.getChannelData(0);
+  let last = 0; for (let i=0;i<len;i++){ last = (last + 0.02*(Math.random()*2-1)) / 1.02; d[i] = last * 3.5; }
+  const src = ac.createBufferSource(); src.buffer = buf; src.loop = true;
+  const bp = ac.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 260; bp.Q.value = 0.8;
+  const amp = ac.createGain(); amp.gain.value = 0.25;
+  const lfo = ac.createOscillator(); lfo.frequency.value = 1.1;
+  const lfoGain = ac.createGain(); lfoGain.gain.value = 0.22;
+  lfo.connect(lfoGain).connect(amp.gain);
+  const master = ac.createGain(); master.gain.value = 0.9;
+  src.connect(bp).connect(amp).connect(master).connect(ac.destination);
+  src.start(); lfo.start();
+  thrillNodes = { src, lfo, master };
+}
+function stopThrillSound(){
+  if (!thrillNodes) return;
+  try { thrillNodes.src.stop(); thrillNodes.lfo.stop(); thrillNodes.master.disconnect(); } catch(e){}
+  thrillNodes = null;
+}
+
+let thrillOn = true, listenOn = false;
+function setListen(on){
+  listenOn = on;
+  $('#btnListen').textContent = on ? '⏸ 停止' : '🔊 聽呼呼聲';
+  $('#btnListen').classList.toggle('on', on);
+  current?.setListening?.(on);
+  if (on && thrillOn) startThrillSound(); else stopThrillSound();
+}
+$('#btnListen').addEventListener('click', ()=>setListen(!listenOn));
+$('#btnStop').addEventListener('click', ()=>{
+  thrillOn = !thrillOn;
+  current?.setThrill?.(thrillOn);
+  $('#btnStop').textContent = thrillOn ? '模擬震顫消失' : '恢復正常';
+  $('#btnStop').classList.toggle('on', !thrillOn);
+  if (!thrillOn){ stopThrillSound(); $('#fisBadge').textContent = '🔴 摸不到震顫、聽不到呼呼聲 → 立即就醫！'; $('#fisBadge').style.color = 'var(--red)'; }
+  else { $('#fisBadge').textContent = '🟢 有震顫、有呼呼聲：正常'; $('#fisBadge').style.color = ''; if (listenOn) startThrillSound(); }
+});
+
+const DONT = {
+  bp:'不能在瘻管這隻手量血壓，壓脈帶會壓住瘻管，可能讓瘻管阻塞。',
+  blood:'不能在瘻管這隻手抽血或打針，抽血請用另一隻手。',
+  heavy:'瘻管側不要提重物，避免血管受壓、受傷。',
+  watch:'不要戴手錶、手環或太緊的飾品，會壓迫血流。',
+  pillow:'睡覺時不要側睡壓到，也不要拿來當枕頭，長時間受壓會阻塞。',
+  tight:'不要穿袖口太緊的衣服，也不要把袖子捲得很緊。',
+};
+let dontKey = null;
+document.querySelectorAll('[data-dont]').forEach(b=>b.addEventListener('click',()=>{
+  const k = b.dataset.dont;
+  dontKey = dontKey === k ? null : k;
+  document.querySelectorAll('[data-dont]').forEach(x=>x.classList.toggle('on', x.dataset.dont === dontKey));
+  current?.showProp?.(dontKey);
+  const r = $('#dontResult'); r.hidden = !dontKey; if (dontKey) r.textContent = '❌ ' + DONT[k];
+}));
+
+/* ================= 路由 ================= */
+const VIEWS = { home:'透析好幫手', dry:'乾體重與水分', fistula:'瘻管照護', er:'何時要立即就醫' };
+const BUILDERS = { dry:buildDry, fistula:buildFistula };
+
+function mountScene(key){
+  const stage = $('#stage-'+key);
+  ensureRenderer();
+  current = BUILDERS[key](stage); current.key = key;
+  if (key === 'dry') updateDryUI('input');
+  if (key === 'fistula'){
+    current.setThrill(thrillOn); current.setListening(listenOn); current.showProp(dontKey);
+    current.onVeinTap = () => { current.flash(); setListen(!listenOn); toast(thrillOn ? '有震顫、有呼呼聲，代表血流通暢 👍' : '震顫消失了，要立即就醫！'); };
+  }
+  resize(); startLoop();
+}
+
+function go(key, push = true){
+  if (!VIEWS[key]) key = 'home';
+  if (current && current.key !== key){ setListen(false); disposeScene(); }
+  speechSynthesis?.cancel?.();
+  document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active', v.id === 'v-'+key));
+  $('#title').textContent = VIEWS[key];
+  $('#backBtn').hidden = key === 'home';
+  window.scrollTo(0, 0);
+  if (BUILDERS[key] && !current) requestAnimationFrame(()=>mountScene(key));
+  if (push) history.pushState({ key }, '', '#'+key);
+}
+document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.go)));
+$('#backBtn').addEventListener('click', ()=>go('home'));
+window.addEventListener('popstate', e=>go(e.state?.key || location.hash.slice(1) || 'home', false));
+
+/* ================= 初始化 ================= */
+$('#callDialysis').href = 'tel:' + CONFIG.DIALYSIS_PHONE.replace(/[^\d+]/g,'');
+$('#callDialysis').innerHTML = `📞 打給透析室<br><span style="font-size:20px">${CONFIG.DIALYSIS_PHONE}</span>`;
+renderRefs(); renderQuiz('dry'); renderQuiz('fistula'); updateWater();
+go(location.hash.slice(1) || 'home', false);
+history.replaceState({ key: location.hash.slice(1) || 'home' }, '', location.hash || '#home');
+
+/* PWA：註冊 Service Worker（離線可用） */
+if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+</body>
+</html>
