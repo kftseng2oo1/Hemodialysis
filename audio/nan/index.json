@@ -1,0 +1,259 @@
+{
+ "lang": "nan",
+ "name": "台語",
+ "recorded": "2026-11-09",
+ "clips": [
+  {
+   "id": "cardioList-1",
+   "file": "cardioList-1.m4a",
+   "text": "戒菸：戒菸一年後，心肌梗塞的風險會減少一半。",
+   "dur": 7.75
+  },
+  {
+   "id": "cardioList-2",
+   "file": "cardioList-2.m4a",
+   "text": "均衡飲食：多吃高纖食物，少吃飽和脂肪與反式脂肪，控制鹽和糖。",
+   "dur": 11.75
+  },
+  {
+   "id": "cardioList-3",
+   "file": "cardioList-3.m4a",
+   "text": "定期運動：在體力許可下，每天約 30 分鐘溫和運動。",
+   "dur": 7.75
+  },
+  {
+   "id": "cardioList-4",
+   "file": "cardioList-4.m4a",
+   "text": "控制體重：降低高血壓、高血脂和糖尿病的風險。",
+   "dur": 9.45
+  },
+  {
+   "id": "cardioList-5",
+   "file": "cardioList-5.m4a",
+   "text": "定期健康檢查：特別是膽固醇和血壓。",
+   "dur": 6.15
+  },
+  {
+   "id": "cardioList-6",
+   "file": "cardioList-6.m4a",
+   "text": "不要濫用抗凝血藥：一定要在醫師監控下使用，自行服用可能造成胃出血、腦出血。",
+   "dur": 14.35
+  },
+  {
+   "id": "crampPrevent-1",
+   "file": "crampPrevent-1.m4a",
+   "text": "兩次透析間體重增加控制在乾體重的 3%至5% 以內",
+   "dur": 13.45
+  },
+  {
+   "id": "crampPrevent-2",
+   "file": "crampPrevent-2.m4a",
+   "text": "少吃鹹，才不會口渴喝太多水",
+   "dur": 6.25
+  },
+  {
+   "id": "crampPrevent-3",
+   "file": "crampPrevent-3.m4a",
+   "text": "透析時穿寬鬆衣物，不影響手腳循環",
+   "dur": 7.05
+  },
+  {
+   "id": "crampPrevent-4",
+   "file": "crampPrevent-4.m4a",
+   "text": "良好的體重控制和穩定的透析習慣，是遠離抽筋的最佳良藥",
+   "dur": 9.85
+  },
+  {
+   "id": "dietKey-1",
+   "file": "dietKey-1.m4a",
+   "text": "蛋白質要足量：雞蛋、魚肉、瘦肉、豆腐",
+   "dur": 7.55
+  },
+  {
+   "id": "dietKey-2",
+   "file": "dietKey-2.m4a",
+   "text": "少吃高鉀水果：香蕉、釋迦、奇異果、哈密瓜、橘子",
+   "dur": 11.15
+  },
+  {
+   "id": "dietKey-3",
+   "file": "dietKey-3.m4a",
+   "text": "楊桃絕對不要吃，可能引發神經毒性",
+   "dur": 6.55
+  },
+  {
+   "id": "dietKey-4",
+   "file": "dietKey-4.m4a",
+   "text": "限磷：避免乳製品、內臟、酵母、堅果",
+   "dur": 10.45
+  },
+  {
+   "id": "dietKey-5",
+   "file": "dietKey-5.m4a",
+   "text": "限鈉：少吃加工食品、罐頭、醃製品、泡麵、濃湯",
+   "dur": 12.35
+  },
+  {
+   "id": "dietKey-6",
+   "file": "dietKey-6.m4a",
+   "text": "不要用低鈉鹽或美味鹽，裡面含高鉀",
+   "dur": 7.55
+  },
+  {
+   "id": "dietKey-7",
+   "file": "dietKey-7.m4a",
+   "text": "磷結合劑（鈣片）要隨餐吃並咬碎，才能帶走食物中的磷",
+   "dur": 10.85
+  },
+  {
+   "id": "dietKey-8",
+   "file": "dietKey-8.m4a",
+   "text": "沒有醫師同意，不要自己吃成藥或草藥",
+   "dur": 5.35
+  },
+  {
+   "id": "dryWhat",
+   "file": "dryWhat.m4a",
+   "text": "乾體重是透析結束時，身體最舒服、沒有多餘水分、血壓穩定的理想體重。這時候不水腫、呼吸順暢。兩次透析之間，體重增加要維持在乾體重的百分之三到五以內。",
+   "dur": 34.45
+  },
+  {
+   "id": "erList-1",
+   "file": "erList-1.m4a",
+   "text": "呼吸困難、喘、胸痛、胸悶、心悸",
+   "dur": 9.65
+  },
+  {
+   "id": "erList-2",
+   "file": "erList-2.m4a",
+   "text": "發燒或疑似感染",
+   "dur": 3.75
+  },
+  {
+   "id": "erList-3",
+   "file": "erList-3.m4a",
+   "text": "瘻管摸不到震顫、聽不到呼呼聲",
+   "dur": 8.15
+  },
+  {
+   "id": "erList-4",
+   "file": "erList-4.m4a",
+   "text": "意識改變、嚴重頭暈或昏迷",
+   "dur": 6.85
+  },
+  {
+   "id": "erList-5",
+   "file": "erList-5.m4a",
+   "text": "出血一直止不住",
+   "dur": 4.65
+  },
+  {
+   "id": "erList-6",
+   "file": "erList-6.m4a",
+   "text": "體重快速上升、明顯水腫",
+   "dur": 6.05
+  },
+  {
+   "id": "fisCare",
+   "file": "fisCare.m4a",
+   "text": "穿刺部位要保持清潔乾燥。如果出現紅、腫、熱、痛或有分泌物，要盡快回診。用導管的人，導管也要保持乾燥清潔，避免感染。透析後針孔要加壓止血約十到十五分鐘。",
+   "dur": 32.25
+  },
+  {
+   "id": "introWhat",
+   "file": "introWhat.m4a",
+   "text": "血液透析是利用透析機，把體內累積的廢物，例如尿素、肌酸酐，還有多餘的水分和電解質排出來，代替一部分腎臟的功能。一般建議每週三次，每次約四小時，實際次數和時間依醫師評估調整。",
+   "dur": 32.05
+  },
+  {
+   "id": "n-1",
+   "file": "n-1.m4a",
+   "text": "第1點",
+   "dur": 1.24
+  },
+  {
+   "id": "n-2",
+   "file": "n-2.m4a",
+   "text": "第2點",
+   "dur": 1.49
+  },
+  {
+   "id": "n-3",
+   "file": "n-3.m4a",
+   "text": "第3點",
+   "dur": 1.61
+  },
+  {
+   "id": "n-4",
+   "file": "n-4.m4a",
+   "text": "第4點",
+   "dur": 1.71
+  },
+  {
+   "id": "n-5",
+   "file": "n-5.m4a",
+   "text": "第5點",
+   "dur": 1.7
+  },
+  {
+   "id": "n-6",
+   "file": "n-6.m4a",
+   "text": "第6點",
+   "dur": 1.5
+  },
+  {
+   "id": "n-7",
+   "file": "n-7.m4a",
+   "text": "第7點",
+   "dur": 1.46
+  },
+  {
+   "id": "n-8",
+   "file": "n-8.m4a",
+   "text": "第8點",
+   "dur": 1.35
+  },
+  {
+   "id": "n-total-2",
+   "file": "n-total-2.m4a",
+   "text": "共有2點。",
+   "dur": 2.1
+  },
+  {
+   "id": "n-total-3",
+   "file": "n-total-3.m4a",
+   "text": "共有3點。",
+   "dur": 1.97
+  },
+  {
+   "id": "n-total-4",
+   "file": "n-total-4.m4a",
+   "text": "共有4點。",
+   "dur": 2.16
+  },
+  {
+   "id": "n-total-5",
+   "file": "n-total-5.m4a",
+   "text": "共有5點。",
+   "dur": 2.13
+  },
+  {
+   "id": "n-total-6",
+   "file": "n-total-6.m4a",
+   "text": "共有6點。",
+   "dur": 1.95
+  },
+  {
+   "id": "n-total-7",
+   "file": "n-total-7.m4a",
+   "text": "共有7點。",
+   "dur": 1.98
+  },
+  {
+   "id": "n-total-8",
+   "file": "n-total-8.m4a",
+   "text": "共有8點。",
+   "dur": 2.13
+  }
+ ]
+}
