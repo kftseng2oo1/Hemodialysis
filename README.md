@@ -6,6 +6,6 @@
 - 瘻管 3D 手臂：震顫呼呼聲、六項禁止事項
 - 就醫警訊：一鍵撥打透析室、119
 
-網址：https://kftseng2oo1.github.io/hemodialysis/
+網址：https://kftseng2oo1.github.io/Hemodialysis/
 
 > 本內容僅供衛教參考，實際以醫療團隊指示為準。

@@ -1,5 +1,5 @@
 // 透析好幫手 Service Worker：快取首頁與 three.js，離線可用
-const CACHE = 'hemodialysis-v2';
+const CACHE = 'Hemodialysis-v2';
 const ASSETS = [
   './',
   './index.html',
