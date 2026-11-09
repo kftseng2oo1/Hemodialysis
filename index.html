@@ -104,6 +104,17 @@
     #printArea .foot{font-size:10pt;margin-top:10px}
     @page{size:A4 landscape;margin:12mm}
   }
+  .stbar{height:12px;border-radius:6px;background:#e7e3da;overflow:hidden;margin:8px 0 4px}
+  #stBarIn{height:100%;background:var(--teal);width:0;transition:width .3s}
+  .sttext{font-size:30px;font-weight:800;line-height:1.5;margin:10px 0;padding:14px;background:#fffdf6;border:2px solid var(--line);border-radius:14px}
+  .btn.rec{width:100%;min-height:72px;font-size:24px;background:#fff;border-color:var(--red);color:var(--red);margin-bottom:6px}
+  .btn.rec.on{background:var(--red);color:#fff}
+  .btn:disabled{opacity:.4}
+  .glossin{width:100%;font:inherit;font-size:19px;border:2px solid var(--line);border-radius:12px;padding:8px 10px}
+  .stg{font-size:15px;color:var(--muted);font-weight:700;margin:12px 0 4px}
+  .strow{display:block;width:100%;text-align:left;font:inherit;font-size:17px;padding:8px 10px;margin:4px 0;border:1px solid var(--line);border-radius:10px;background:#fff;line-height:1.4}
+  .strow.cur{border:2px solid var(--teal);background:var(--teal-soft)}
+  .stlink{display:block;width:100%;border:0;background:none;font:inherit;text-align:center;margin-top:10px;color:var(--teal);font-weight:700;font-size:18px}
   .reading{background:#fff5d6;border-radius:8px;outline:3px solid #f2b705;outline-offset:2px}
   .speak{float:right;min-height:44px;font-size:16px;padding:4px 12px;border-radius:12px;border:1px solid var(--line);background:#fff;color:var(--teal);font-weight:700}
 
@@ -170,6 +181,7 @@
         <input type="range" id="rateSel" min="0.6" max="1.1" step="0.05" value="0.85" style="flex:1;width:auto">
         <span class="muted" style="min-width:0;font-weight:400">快</span></label>
       <button class="btn primary" id="voiceTest" style="width:100%;margin-top:6px">▶ 試聽</button>
+      <button data-go="studio" class="stlink">🎙 錄音工作台（錄音人員用）</button>
       <p class="muted" id="voiceHint" style="font-size:16px;margin-bottom:0">想要更多、更自然的聲音：iPhone 到「設定 → 輔助使用 → 朗讀內容 → 聲音 → 中文」下載，回到這裡就能選。</p>
     </div>
   </section>
@@ -550,6 +562,42 @@
       <input type="file" id="importFile" accept="application/json,.json" hidden>
     </div>
   </section>
+
+  <!-- ========== 錄音工作台 ========== -->
+  <section class="view" id="v-studio">
+    <div class="card">
+      <label class="row" style="margin-top:0"><span>錄哪一種</span><select id="stLang" class="sel-in"><option value="nan">台語</option><option value="hak">客語</option></select></label>
+      <div class="stbar"><div id="stBarIn"></div></div>
+      <div class="muted" id="stProg" style="font-size:17px"></div>
+    </div>
+    <div class="card" id="stCard">
+      <div class="muted" id="stGroup" style="font-size:16px"></div>
+      <div id="stText" class="sttext"></div>
+      <div class="muted" style="font-size:16px">看著上面的華語，用自然的<span id="stLangName">台語</span>講出來；開頭和結尾各停 1 秒。</div>
+      <div id="stStatus" style="font-weight:700;margin:8px 0;min-height:1.6em"></div>
+      <button class="btn rec" id="stRec">🎙 開始錄音</button>
+      <div class="btnrow">
+        <button class="btn" id="stPlay">▶ 試聽</button>
+        <button class="btn" id="stDel">🗑 刪除重錄</button>
+        <button class="btn" id="stPrev">‹ 上一段</button>
+        <button class="btn primary" id="stNext">下一段 ›</button>
+      </div>
+    </div>
+    <div class="card">
+      <h2>用詞提醒</h2>
+      <p class="muted" style="font-size:16px;margin-top:0">先和醫護確認這些詞的<span class="stLN">台語</span>講法，寫在下面，每一段都照著講，前後才一致。只存在這支手機。</p>
+      <textarea id="stGloss" rows="8" class="glossin"></textarea>
+    </div>
+    <div class="card">
+      <h2>全部段落</h2>
+      <div id="stList"></div>
+    </div>
+    <div class="card">
+      <h2>錄完了</h2>
+      <p class="muted" style="font-size:16px;margin-top:0">按下面按鈕把錄音打包成一個檔，用 LINE 或 Email 傳給開發者放進 App。</p>
+      <button class="btn primary" id="stExport" style="width:100%">📦 匯出全部錄音</button>
+    </div>
+  </section>
 </main>
 <div class="toast" id="toast"></div>
 <div id="printArea"></div>
@@ -647,17 +695,47 @@ function utter(text){
   u.rate = voicePref.rate || 0.85;
   return u;
 }
+/* ===== 真人錄音（台語／客語）：發佈檔在 audio/<lang>/，本機錄音在 IndexedDB ===== */
+const HUMAN_LANGS = { nan: '台語', hak: '客語' };
+const humanClips = { nan: {}, hak: {} };          // id → url（同步可取，iOS 點擊後要立刻播放）
+const AUDIO_DB = 'hemodialysis-audio';
+function idb(){ return new Promise((ok, no) => { if (!window.indexedDB) return no('no idb');
+  const r = indexedDB.open(AUDIO_DB, 1); r.onupgradeneeded = () => r.result.createObjectStore('clips'); r.onsuccess = () => ok(r.result); r.onerror = () => no(r.error); }); }
+async function idbDo(mode, fn){ const db = await idb(); return new Promise((ok, no) => { const tx = db.transaction('clips', mode), st = tx.objectStore('clips');
+  const req = fn(st); tx.oncomplete = () => ok(req?.result); tx.onerror = () => no(tx.error); }); }
+const clipPut = (lang, id, v) => idbDo('readwrite', st => st.put(v, `${lang}/${id}`));
+const clipDel = (lang, id) => idbDo('readwrite', st => st.delete(`${lang}/${id}`));
+async function clipAll(lang){
+  const db = await idb(); return new Promise((ok, no) => { const out = {}, tx = db.transaction('clips'), cur = tx.objectStore('clips').openCursor();
+    cur.onsuccess = () => { const c = cur.result; if (!c) return; if (String(c.key).startsWith(lang + '/')) out[String(c.key).slice(lang.length + 1)] = c.value; c.continue(); };
+    tx.oncomplete = () => ok(out); tx.onerror = () => no(tx.error); });
+}
+const localUrls = {};
+async function loadHumanClips(){
+  for (const lang in HUMAN_LANGS){
+    const map = {};
+    try { const r = await fetch(`audio/${lang}/index.json`, { cache: 'no-cache' });
+      if (r.ok){ const j = await r.json(); (j.clips || []).forEach(c => { map[c.id] = `audio/${lang}/${c.file}`; }); } } catch(e){}
+    try { const loc = await clipAll(lang);
+      for (const id in loc){ const k = lang + '/' + id; if (localUrls[k]) URL.revokeObjectURL(localUrls[k]); map[id] = localUrls[k] = URL.createObjectURL(loc[id].blob); } } catch(e){}
+    humanClips[lang] = map;
+  }
+  fillVoices();
+}
+const hasHuman = lang => Object.keys(humanClips[lang] || {}).length > 0;
+
 function fillVoices(){
   const sel = $('#voiceSel'); if (!sel) return;
-  const list = zhVoices();
-  if (!list.length){ sel.innerHTML = '<option>（系統預設）</option>'; return; }
-  const cur = zhVoice();
-  sel.innerHTML = list.map((v, i) => {
+  const list = zhVoices(), cur = zhVoice();
+  const human = Object.keys(HUMAN_LANGS).filter(hasHuman).map(l =>
+    `<option value="h:${l}"${voicePref.human === l ? ' selected' : ''}>${HUMAN_LANGS[l]}（真人錄音）</option>`).join('');
+  const tts = list.length ? list.map((v, i) => {
     const m = v.lang.match(/[-_]([A-Z]{2})/i), region = m ? (REGION[m[1].toUpperCase()] || m[1]) : '';
     const q = /premium/i.test(v.name) ? '・頂級' : /enhanced/i.test(v.name) ? '・高品質' : '';
     const name = v.name.replace(/\s*\(.*?\)\s*/g, ' ').trim() + q;
-    return `<option value="${i}"${v === cur ? ' selected' : ''}>${name}${region ? '（' + region + '）' : ''}</option>`;
-  }).join('');
+    return `<option value="${i}"${!voicePref.human && v === cur ? ' selected' : ''}>${name}${region ? '（' + region + '）' : ''}</option>`;
+  }).join('') : '<option value="">（系統預設）</option>';
+  sel.innerHTML = human + tts;
 }
 function saveVoice(){ try { localStorage.setItem(VOICE_KEY, JSON.stringify(voicePref)); } catch(e){} }
 if ('speechSynthesis' in window){
@@ -665,12 +743,25 @@ if ('speechSynthesis' in window){
   speechSynthesis.addEventListener?.('voiceschanged', fillVoices);
   setTimeout(fillVoices, 500);
 }
-$('#voiceSel').addEventListener('change', e => { const v = zhVoices()[+e.target.value]; if (v){ voicePref.uri = v.voiceURI; saveVoice(); speak('您好，我是' + v.name.split(/[\s(（]/)[0] + '，我來唸給您聽。'); } });
+loadHumanClips();
+$('#voiceSel').addEventListener('change', e => {
+  const val = e.target.value;
+  if (val.startsWith('h:')){ voicePref.human = val.slice(2); saveVoice(); speakBlock(document.querySelector('#erList'), null, true); return; }
+  voicePref.human = null;
+  const v = zhVoices()[+val]; if (v){ voicePref.uri = v.voiceURI; } saveVoice();
+  speak('您好，我是' + (v ? v.name.split(/[\s(（]/)[0] : '系統語音') + '，我來唸給您聽。');
+});
 $('#rateSel').value = voicePref.rate || 0.85;
 $('#rateSel').addEventListener('change', e => { voicePref.rate = +e.target.value; saveVoice(); speak('這是現在的說話速度。'); });
-$('#voiceTest').addEventListener('click', () => speak('您好，兩次透析之間，體重增加要控制在乾體重的百分之三到五以內。'));
+$('#voiceTest').addEventListener('click', () => voicePref.human && hasHuman(voicePref.human)
+  ? speakBlock(document.querySelector('#erList'), null, true)
+  : speak('您好，兩次透析之間，體重增加要控制在乾體重的百分之三到五以內。'));
+
+let clipAudio = null, playToken = 0;
 function stopSpeak(){
+  playToken++;
   if ('speechSynthesis' in window) speechSynthesis.cancel();
+  if (clipAudio){ clipAudio.onended = clipAudio.onerror = null; clipAudio.pause(); }
   document.querySelectorAll('.reading').forEach(x=>x.classList.remove('reading'));
   if (speakBtn){ speakBtn.textContent = '🔊 唸給我聽'; speakBtn = null; }
 }
@@ -679,23 +770,53 @@ function speak(text){
   stopSpeak();
   speechSynthesis.speak(utter(text));
 }
-function speakBlock(el, btn){
-  if (!('speechSynthesis' in window)) return toast('這台裝置不支援朗讀');
-  const again = speakBtn === btn;
+function blockParts(el){
+  const items = el.matches('ul,ol') ? [...el.querySelectorAll(':scope > li')] : [el];
+  const multi = items.length > 1, parts = [];
+  if (multi) parts.push({ li: null, id: `n-total-${items.length}`, text: `共有${items.length}點。` });
+  items.forEach((li, i) => {
+    const t = li.innerText.trim(), id = multi ? `${el.id}-${i + 1}` : el.id;
+    parts.push({ li, id, text: t, num: multi ? { id: `n-${i + 1}`, text: `第${i + 1}點，` } : null });
+  });
+  return parts;
+}
+function speakBlock(el, btn, quiet){
+  const again = btn && speakBtn === btn;
   stopSpeak();
   if (again) return;               // 再按一次＝停止
-  const items = el.matches('ul,ol') ? [...el.querySelectorAll(':scope > li')] : [el];
-  const parts = items.map((li, i) => ({ li, text: items.length > 1 ? `第${i + 1}點，${li.innerText.trim()}` : li.innerText.trim() }));
-  if (items.length > 1) parts.unshift({ li: null, text: `共有${items.length}點。` });
-  speakBtn = btn; btn.textContent = '⏹ 停止';
-  parts.forEach((p, i) => {
-    const u = utter(p.text);
-    u.onstart = () => { document.querySelectorAll('.reading').forEach(x=>x.classList.remove('reading')); p.li?.classList.add('reading'); };
-    if (i === parts.length - 1) u.onend = () => { if (speakBtn === btn) stopSpeak(); };
-    speechSynthesis.speak(u);
-  });
+  const parts = blockParts(el);
+  const lang = voicePref.human && hasHuman(voicePref.human) ? voicePref.human : null;
+  if (btn){ speakBtn = btn; btn.textContent = '⏹ 停止'; }
+  const mark = li => { document.querySelectorAll('.reading').forEach(x=>x.classList.remove('reading')); li?.classList.add('reading'); };
+  if (!lang){                      // 全部用系統語音：一次排入佇列
+    if (!('speechSynthesis' in window)){ stopSpeak(); return toast('這台裝置不支援朗讀'); }
+    parts.forEach((p, i) => {
+      const u = utter((p.num ? p.num.text : '') + p.text);
+      u.onstart = () => mark(p.li);
+      if (i === parts.length - 1) u.onend = () => { if (speakBtn === btn) stopSpeak(); };
+      speechSynthesis.speak(u);
+    });
+    return;
+  }
+  // 真人錄音：逐段串接，缺的段落改用系統語音
+  const clips = humanClips[lang], seq = [];
+  parts.forEach(p => { if (p.num) seq.push({ li: p.li, id: p.num.id, text: p.num.text }); seq.push(p); });
+  const token = ++playToken; let k = 0;
+  clipAudio ||= new Audio();
+  const next = () => {
+    if (token !== playToken) return;
+    if (k >= seq.length){ if (!btn || speakBtn === btn) stopSpeak(); return; }
+    const p = seq[k++]; mark(p.li);
+    const url = clips[p.id];
+    const tts = () => { if (!('speechSynthesis' in window)) return next(); const u = utter(p.text); u.onend = u.onerror = next; speechSynthesis.speak(u); };
+    if (!url) return tts();
+    clipAudio.onended = next; clipAudio.onerror = () => { clipAudio.onerror = null; tts(); };
+    clipAudio.src = url; clipAudio.play().catch(() => tts());
+  };
+  next();
 }
 document.querySelectorAll('[data-speak]').forEach(b=>b.addEventListener('click',()=>speakBlock($('#'+b.dataset.speak), b)));
+
 
 /* Web Audio：iOS 需在使用者點擊後解鎖 */
 let actx = null;
@@ -1801,9 +1922,137 @@ $('#printSheet').addEventListener('click', () => {
   setTimeout(() => window.print(), 100);
 });
 
+/* ================= 錄音工作台 ================= */
+const GLOSS_DEFAULT = `乾體重：
+透析（洗腎）：
+瘻管：
+震顫、呼呼聲：
+透析液：
+脫水：
+磷結合劑（鈣片）：
+低鈉鹽：
+楊桃：
+抽筋：
+心肌梗塞：
+抗凝血藥：`;
+const ST = { lang: 'nan', list: [], i: 0, have: {}, rec: null, stream: null, chunks: [], t0: 0, timer: 0 };
+function studioCatalog(){
+  const list = []; let maxN = 0;
+  document.querySelectorAll('[data-speak]').forEach(b => {
+    const el = $('#' + b.dataset.speak); if (!el) return;
+    const view = b.closest('.view')?.id.slice(2), title = b.closest('.card')?.querySelector('h2')?.textContent.trim() || '';
+    blockParts(el).forEach(p => { if (p.li) list.push({ id: p.id, text: p.text, group: `${VIEWS[view] || ''}｜${title}` }); });
+    const n = el.matches('ul,ol') ? el.querySelectorAll(':scope > li').length : 1; if (n > 1) maxN = Math.max(maxN, n);
+  });
+  const nums = [];
+  for (let n = 1; n <= maxN; n++) nums.push({ id: `n-${n}`, text: `第${n}點`, group: '編號（播放時接在每一點前面）' });
+  for (let n = 2; n <= maxN; n++) nums.push({ id: `n-total-${n}`, text: `共有${n}點。`, group: '編號（清單開頭）' });
+  return [...nums, ...list];
+}
+async function studioOpen(){
+  ST.list = studioCatalog();
+  try { $('#stGloss').value = localStorage.getItem('hemodialysis.gloss.' + ST.lang) || GLOSS_DEFAULT; } catch(e){ $('#stGloss').value = GLOSS_DEFAULT; }
+  try { ST.have = await clipAll(ST.lang); } catch(e){ ST.have = {}; toast('這支手機不能存錄音'); }
+  const first = ST.list.findIndex(c => !ST.have[c.id]);
+  ST.i = first < 0 ? 0 : first;
+  studioRender();
+}
+function studioRender(){
+  const c = ST.list[ST.i], done = ST.list.filter(x => ST.have[x.id]).length, name = HUMAN_LANGS[ST.lang];
+  $('#stLangName').textContent = name; document.querySelectorAll('.stLN').forEach(x => x.textContent = name);
+  $('#stProg').textContent = `已錄 ${done} / ${ST.list.length} 段　｜　現在第 ${ST.i + 1} 段`;
+  $('#stBarIn').style.width = (done / ST.list.length * 100) + '%';
+  $('#stGroup').textContent = c.group; $('#stText').textContent = c.text;
+  const has = ST.have[c.id];
+  $('#stStatus').innerHTML = ST.rec ? '' : has ? `✅ 已錄好（${(has.dur || 0).toFixed(1)} 秒）` : '⬜ 還沒錄';
+  $('#stPlay').disabled = $('#stDel').disabled = !has;
+  if (!ST.rec) $('#stRec').textContent = has ? '🎙 重新錄音' : '🎙 開始錄音';
+  $('#stPrev').disabled = ST.i === 0; $('#stNext').disabled = ST.i === ST.list.length - 1;
+  let g = '';
+  $('#stList').innerHTML = ST.list.map((x, i) => { const head = x.group !== g ? `<div class="stg">${(g = x.group)}</div>` : '';
+    return head + `<button class="strow${i === ST.i ? ' cur' : ''}" data-st="${i}">${ST.have[x.id] ? '✅' : '⬜'} ${x.text}</button>`; }).join('');
+  $('#stList').querySelectorAll('[data-st]').forEach(b => b.addEventListener('click', () => { if (ST.rec) return toast('先停止錄音'); ST.i = +b.dataset.st; studioRender(); window.scrollTo({ top: 0, behavior: 'smooth' }); }));
+}
+function pickMime(){ if (!window.MediaRecorder?.isTypeSupported) return ''; return ['audio/mp4', 'audio/aac', 'audio/webm;codecs=opus', 'audio/webm'].find(t => MediaRecorder.isTypeSupported(t)) || ''; }
+async function studioRecToggle(){
+  if (ST.rec) return ST.rec.stop();
+  if (!navigator.mediaDevices?.getUserMedia || !window.MediaRecorder) return toast('這支手機不支援錄音，請更新系統');
+  stopSpeak();
+  try { ST.stream ||= await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } }); }
+  catch(e){ return toast('沒有麥克風權限，請到設定允許'); }
+  const mt = pickMime(); let r;
+  try { r = mt ? new MediaRecorder(ST.stream, { mimeType: mt }) : new MediaRecorder(ST.stream); } catch(e){ r = new MediaRecorder(ST.stream); }
+  ST.rec = r; ST.chunks = []; ST.t0 = Date.now();
+  const c = ST.list[ST.i];
+  r.ondataavailable = e => { if (e.data.size) ST.chunks.push(e.data); };
+  r.onstop = async () => {
+    clearInterval(ST.timer); ST.rec = null;
+    $('#stRec').textContent = '🎙 開始錄音'; $('#stRec').classList.remove('on');
+    const blob = new Blob(ST.chunks, { type: r.mimeType || mt || 'audio/mp4' }), dur = (Date.now() - ST.t0) / 1000;
+    if (dur < 0.8){ studioRender(); return toast('太短了，再錄一次'); }
+    const v = { blob, type: blob.type, dur, t: Date.now(), text: c.text };
+    try { await clipPut(ST.lang, c.id, v); ST.have[c.id] = v; } catch(e){ return toast('存檔失敗'); }
+    studioRender(); studioPlay(); loadHumanClips();
+  };
+  r.start();
+  $('#stRec').textContent = '⏹ 停止'; $('#stRec').classList.add('on');
+  ST.timer = setInterval(() => { $('#stStatus').innerHTML = `<span style="color:var(--red)">● 錄音中 ${((Date.now() - ST.t0) / 1000).toFixed(0)} 秒</span>`; }, 250);
+  $('#stStatus').innerHTML = '<span style="color:var(--red)">● 錄音中 0 秒</span>';
+}
+let stAudio = null;
+function studioPlay(){ const h = ST.have[ST.list[ST.i].id]; if (!h) return;
+  stAudio?.pause(); if (stAudio?.src) URL.revokeObjectURL(stAudio.src);
+  stAudio = new Audio(URL.createObjectURL(h.blob)); stAudio.play().catch(() => toast('無法播放')); }
+function studioStop(){ if (ST.rec){ ST.rec.onstop = null; ST.rec.stop(); ST.rec = null; clearInterval(ST.timer); }
+  ST.stream?.getTracks().forEach(t => t.stop()); ST.stream = null; stAudio?.pause(); }
+$('#stRec').addEventListener('click', studioRecToggle);
+$('#stPlay').addEventListener('click', studioPlay);
+$('#stDel').addEventListener('click', async () => { const c = ST.list[ST.i]; if (!confirm('刪掉這段錄音？')) return;
+  await clipDel(ST.lang, c.id); delete ST.have[c.id]; studioRender(); loadHumanClips(); });
+$('#stPrev').addEventListener('click', () => { if (ST.rec) return toast('先停止錄音'); if (ST.i > 0){ ST.i--; studioRender(); } });
+$('#stNext').addEventListener('click', () => { if (ST.rec) return toast('先停止錄音'); if (ST.i < ST.list.length - 1){ ST.i++; studioRender(); } });
+$('#stLang').addEventListener('change', e => { if (ST.rec) return toast('先停止錄音'); ST.lang = e.target.value; studioOpen(); });
+$('#stGloss').addEventListener('input', e => { try { localStorage.setItem('hemodialysis.gloss.' + ST.lang, e.target.value); } catch(err){} });
+
+/* 匯出：不壓縮的 zip（store），不需外部函式庫 */
+const CRC = (() => { const t = new Uint32Array(256); for (let n = 0; n < 256; n++){ let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
+const crc32 = u8 => { let c = 0xFFFFFFFF; for (let i = 0; i < u8.length; i++) c = CRC[(c ^ u8[i]) & 255] ^ (c >>> 8); return (c ^ 0xFFFFFFFF) >>> 0; };
+function makeZip(files){
+  const now = new Date(), DOS_T = (now.getHours() << 11) | (now.getMinutes() << 5) | (now.getSeconds() >> 1),
+    DOS_D = ((now.getFullYear() - 1980) << 9) | ((now.getMonth() + 1) << 5) | now.getDate();
+  const enc = new TextEncoder(), parts = [], central = []; let off = 0;
+  files.forEach(f => {
+    const name = enc.encode(f.name), data = f.data, crc = crc32(data);
+    const h = new DataView(new ArrayBuffer(30));
+    h.setUint32(0, 0x04034b50, true); h.setUint16(4, 20, true); h.setUint16(6, 0x0800, true); h.setUint16(8, 0, true);
+    h.setUint16(10, DOS_T, true); h.setUint16(12, DOS_D, true); h.setUint32(14, crc, true); h.setUint32(18, data.length, true); h.setUint32(22, data.length, true); h.setUint16(26, name.length, true);
+    parts.push(h, name, data);
+    const c = new DataView(new ArrayBuffer(46));
+    c.setUint32(0, 0x02014b50, true); c.setUint16(4, 20, true); c.setUint16(6, 20, true); c.setUint16(8, 0x0800, true);
+    c.setUint16(12, DOS_T, true); c.setUint16(14, DOS_D, true); c.setUint32(16, crc, true); c.setUint32(20, data.length, true); c.setUint32(24, data.length, true); c.setUint16(28, name.length, true); c.setUint32(42, off, true);
+    central.push(c, name);
+    off += 30 + name.length + data.length;
+  });
+  const size = central.reduce((s, x) => s + (x.byteLength ?? x.length), 0);
+  const e = new DataView(new ArrayBuffer(22));
+  e.setUint32(0, 0x06054b50, true); e.setUint16(8, files.length, true); e.setUint16(10, files.length, true); e.setUint32(12, size, true); e.setUint32(16, off, true);
+  return new Blob([...parts, ...central, e], { type: 'application/zip' });
+}
+$('#stExport').addEventListener('click', async () => {
+  const have = await clipAll(ST.lang), ids = Object.keys(have);
+  if (!ids.length) return toast('還沒有錄音');
+  const files = [], manifest = { lang: ST.lang, exported: new Date().toISOString(), gloss: $('#stGloss').value, clips: [] };
+  for (const id of ids){ const v = have[id], ext = /webm/.test(v.type) ? 'webm' : /ogg/.test(v.type) ? 'ogg' : 'm4a';
+    files.push({ name: `${ST.lang}/${id}.${ext}`, data: new Uint8Array(await v.blob.arrayBuffer()) });
+    manifest.clips.push({ id, file: `${id}.${ext}`, text: v.text, dur: v.dur }); }
+  files.push({ name: `${ST.lang}/manifest.json`, data: new TextEncoder().encode(JSON.stringify(manifest, null, 1)) });
+  const d = new Date();
+  deliverFile(new File([makeZip(files)], `透析衛教-${HUMAN_LANGS[ST.lang]}錄音-${d.getMonth() + 1}${pad2(d.getDate())}.zip`, { type: 'application/zip' }));
+});
+
 /* ================= 路由 ================= */
 const VIEWS = { home:'透析好幫手', dry:'乾體重與水分', fistula:'瘻管照護', er:'何時要立即就醫',
-  log:'我的紀錄', intro:'認識血液透析', diet:'飲食與用藥', exercise:'運動', cramp:'肌肉抽搐', cardio:'預防心血管疾病' };
+  log:'我的紀錄', studio:'錄音工作台', intro:'認識血液透析', diet:'飲食與用藥', exercise:'運動', cramp:'肌肉抽搐', cardio:'預防心血管疾病' };
 const BUILDERS = { dry:buildDry, fistula:buildFistula, intro:buildIntro, diet:buildDiet, exercise:buildExercise, cramp:buildCramp };
 
 function mountScene(key){
@@ -1840,6 +2089,7 @@ function go(key, push = true){
   if (current && current.key !== key){ setListen(false); disposeScene(); }
   if (key !== 'exercise' && exTimer.running) exPause();
   if (key === 'log'){ renderSetup(); renderLog(); renderDrink(); }
+  if (key === 'studio') studioOpen(); else studioStop();
   stopSpeak();
   document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active', v.id === 'v-'+key));
   $('#title').textContent = VIEWS[key];

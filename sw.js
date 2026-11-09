@@ -1,5 +1,5 @@
 // 透析好幫手 Service Worker：快取首頁與 three.js，離線可用
-const CACHE = 'Hemodialysis-v8';
+const CACHE = 'Hemodialysis-v9';
 const ASSETS = [
   './',
   './index.html',
@@ -26,11 +26,11 @@ self.addEventListener('activate', e => {
 // 頁面：網路優先（拿到最新衛教內容），失敗才用快取；其他資源：快取優先
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
-  const isPage = e.request.mode === 'navigate';
+  const isPage = e.request.mode === 'navigate' || new URL(e.request.url).pathname.endsWith('/index.json');
   e.respondWith(
     isPage
       ? fetch(e.request).then(r => { const copy = r.clone(); caches.open(CACHE).then(c => c.put(e.request, copy)); return r; })
-          .catch(() => caches.match(e.request).then(r => r || caches.match('./index.html')))
+          .catch(() => caches.match(e.request).then(r => r || (e.request.mode === 'navigate' ? caches.match('./index.html') : new Response('{}', { status: 404 }))))
       : caches.match(e.request).then(r => r || fetch(e.request).then(res => {
           if (res.ok) { const copy = res.clone(); caches.open(CACHE).then(c => c.put(e.request, copy)); }
           return res;
