@@ -85,6 +85,7 @@
   .tag{font-size:15px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:1px 8px;margin-left:4px}
   .del{min-width:44px;min-height:44px;border:0;border-radius:12px;background:rgba(0,0,0,.06);font-size:18px;color:var(--muted)}
   .btnrow{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
+  .reading{background:#fff5d6;border-radius:8px;outline:3px solid #f2b705;outline-offset:2px}
   .speak{float:right;min-height:44px;font-size:16px;padding:4px 12px;border-radius:12px;border:1px solid var(--line);background:#fff;color:var(--teal);font-weight:700}
 
   table.simple{width:100%;border-collapse:collapse;font-size:17px}
@@ -557,16 +558,42 @@ function renderQuiz(key){
 }
 
 /* 語音：先用系統 zh-TW 語音，之後可換 tts-studio 預錄 mp3 */
+/* 朗讀：清單逐點唸「第1點、第2點…」，每點分開念並高亮，點與點之間自然停頓 */
+let speakBtn = null;
+function zhVoice(){ return speechSynthesis.getVoices().find(v=>/zh[-_]TW/i.test(v.lang)); }
+function utter(text){
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'zh-TW'; u.rate = 0.85;
+  const v = zhVoice(); if (v) u.voice = v;
+  return u;
+}
+function stopSpeak(){
+  if ('speechSynthesis' in window) speechSynthesis.cancel();
+  document.querySelectorAll('.reading').forEach(x=>x.classList.remove('reading'));
+  if (speakBtn){ speakBtn.textContent = '🔊 唸給我聽'; speakBtn = null; }
+}
 function speak(text){
   if (!('speechSynthesis' in window)) return toast('這台裝置不支援朗讀');
-  speechSynthesis.cancel();
-  const u = new SpeechSynthesisUtterance(text);
-  u.lang = 'zh-TW'; u.rate = 0.9;
-  const v = speechSynthesis.getVoices().find(v=>/zh[-_]TW/i.test(v.lang));
-  if (v) u.voice = v;
-  speechSynthesis.speak(u);
+  stopSpeak();
+  speechSynthesis.speak(utter(text));
 }
-document.querySelectorAll('[data-speak]').forEach(b=>b.addEventListener('click',()=>speak($('#'+b.dataset.speak).innerText)));
+function speakBlock(el, btn){
+  if (!('speechSynthesis' in window)) return toast('這台裝置不支援朗讀');
+  const again = speakBtn === btn;
+  stopSpeak();
+  if (again) return;               // 再按一次＝停止
+  const items = el.matches('ul,ol') ? [...el.querySelectorAll(':scope > li')] : [el];
+  const parts = items.map((li, i) => ({ li, text: items.length > 1 ? `第${i + 1}點，${li.innerText.trim()}` : li.innerText.trim() }));
+  if (items.length > 1) parts.unshift({ li: null, text: `共有${items.length}點。` });
+  speakBtn = btn; btn.textContent = '⏹ 停止';
+  parts.forEach((p, i) => {
+    const u = utter(p.text);
+    u.onstart = () => { document.querySelectorAll('.reading').forEach(x=>x.classList.remove('reading')); p.li?.classList.add('reading'); };
+    if (i === parts.length - 1) u.onend = () => { if (speakBtn === btn) stopSpeak(); };
+    speechSynthesis.speak(u);
+  });
+}
+document.querySelectorAll('[data-speak]').forEach(b=>b.addEventListener('click',()=>speakBlock($('#'+b.dataset.speak), b)));
 
 /* Web Audio：iOS 需在使用者點擊後解鎖 */
 let actx = null;
@@ -1595,7 +1622,7 @@ function go(key, push = true){
   if (current && current.key !== key){ setListen(false); disposeScene(); }
   if (key !== 'exercise' && exTimer.running) exPause();
   if (key === 'log'){ renderSetup(); renderLog(); }
-  speechSynthesis?.cancel?.();
+  stopSpeak();
   document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active', v.id === 'v-'+key));
   $('#title').textContent = VIEWS[key];
   $('#backBtn').hidden = key === 'home';
