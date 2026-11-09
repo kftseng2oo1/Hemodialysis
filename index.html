@@ -1978,7 +1978,8 @@ async function studioRecToggle(){
   if (ST.rec) return ST.rec.stop();
   if (!navigator.mediaDevices?.getUserMedia || !window.MediaRecorder) return toast('這支手機不支援錄音，請更新系統');
   stopSpeak();
-  try { ST.stream ||= await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } }); }
+  stAudio?.pause();
+  try { ST.stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } }); }
   catch(e){ return toast('沒有麥克風權限，請到設定允許'); }
   const mt = pickMime(); let r;
   try { r = mt ? new MediaRecorder(ST.stream, { mimeType: mt }) : new MediaRecorder(ST.stream); } catch(e){ r = new MediaRecorder(ST.stream); }
@@ -1987,12 +1988,14 @@ async function studioRecToggle(){
   r.ondataavailable = e => { if (e.data.size) ST.chunks.push(e.data); };
   r.onstop = async () => {
     clearInterval(ST.timer); ST.rec = null;
+    ST.stream?.getTracks().forEach(t => t.stop()); ST.stream = null;
     $('#stRec').textContent = '🎙 開始錄音'; $('#stRec').classList.remove('on');
     const blob = new Blob(ST.chunks, { type: r.mimeType || mt || 'audio/mp4' }), dur = (Date.now() - ST.t0) / 1000;
     if (dur < 0.8){ studioRender(); return toast('太短了，再錄一次'); }
+    if (blob.size < 800){ studioRender(); return toast('錄音沒有成功，請再錄一次'); }
     const v = { blob, type: blob.type, dur, t: Date.now(), text: c.text };
     try { await clipPut(ST.lang, c.id, v); ST.have[c.id] = v; } catch(e){ return toast('存檔失敗'); }
-    studioRender(); studioPlay(); loadHumanClips();
+    studioRender(); studioPlay(true); loadHumanClips();
   };
   r.start();
   $('#stRec').textContent = '⏹ 停止'; $('#stRec').classList.add('on');
@@ -2000,9 +2003,12 @@ async function studioRecToggle(){
   $('#stStatus').innerHTML = '<span style="color:var(--red)">● 錄音中 0 秒</span>';
 }
 let stAudio = null;
-function studioPlay(){ const h = ST.have[ST.list[ST.i].id]; if (!h) return;
-  stAudio?.pause(); if (stAudio?.src) URL.revokeObjectURL(stAudio.src);
-  stAudio = new Audio(URL.createObjectURL(h.blob)); stAudio.play().catch(() => toast('無法播放')); }
+function studioPlay(auto){ const h = ST.have[ST.list[ST.i].id]; if (!h) return;
+  if (stAudio){ stAudio.pause(); if (stAudio.src.startsWith('blob:')) URL.revokeObjectURL(stAudio.src); }
+  stAudio = new Audio(); stAudio.preload = 'auto';
+  stAudio.src = URL.createObjectURL(h.blob.type ? h.blob : new Blob([h.blob], { type: h.type || 'audio/mp4' }));
+  stAudio.load();
+  stAudio.play().catch(() => { if (!auto) toast('無法播放，請按「重新錄音」再錄一次'); }); }
 function studioStop(){ if (ST.rec){ ST.rec.onstop = null; ST.rec.stop(); ST.rec = null; clearInterval(ST.timer); }
   ST.stream?.getTracks().forEach(t => t.stop()); ST.stream = null; stAudio?.pause(); }
 $('#stRec').addEventListener('click', studioRecToggle);
