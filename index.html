@@ -73,6 +73,17 @@
   .btn.primary{background:var(--teal);color:#fff}
   .btn.on{background:var(--red);border-color:var(--red);color:#fff}
   [data-ex].on,[data-min].on{background:var(--teal);border-color:var(--teal)}
+  .btn.sel{background:var(--teal);border-color:var(--teal);color:#fff}
+  .days{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin:6px 0 4px}
+  .days .btn{min-height:48px;padding:0}
+  .timein{font:inherit;font-size:22px;padding:6px 10px;border:2px solid var(--line);border-radius:12px;background:#fff}
+  .logrow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;margin:8px 0;border-radius:14px;border-left:8px solid}
+  .logrow.z-green{border-color:var(--green);background:var(--green-soft)}
+  .logrow.z-yellow{border-color:var(--yellow);background:var(--yellow-soft)}
+  .logrow.z-red{border-color:var(--red);background:var(--red-soft)}
+  .logrow b{font-size:26px}
+  .tag{font-size:15px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:1px 8px;margin-left:4px}
+  .del{min-width:44px;min-height:44px;border:0;border-radius:12px;background:rgba(0,0,0,.06);font-size:18px;color:var(--muted)}
   .btnrow{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
   .speak{float:right;min-height:44px;font-size:16px;padding:4px 12px;border-radius:12px;border:1px solid var(--line);background:#fff;color:var(--teal);font-weight:700}
 
@@ -117,7 +128,9 @@
   <!-- ========== 首頁 ========== -->
   <section class="view active" id="v-home">
     <div class="disclaimer">本內容僅供衛教參考，實際以醫療團隊指示為準。</div>
+    <div class="result" id="homeAlert" hidden style="margin:0 0 12px"></div>
     <div class="grid">
+      <button class="unit hot" data-go="log" style="grid-column:1/-1"><span class="emo">📒</span><b>我的體重紀錄</b><span>每天記錄、看趨勢、超標提醒</span></button>
       <button class="unit hot" data-go="dry"><span class="emo">💧</span><b>乾體重與水分</b><span>水球人：體重增加多少才安全？</span></button>
       <button class="unit hot" data-go="fistula"><span class="emo">💪</span><b>瘻管照護</b><span>摸摸看、聽聽看，哪些事不能做</span></button>
       <button class="unit alert" data-go="er" style="grid-column:1/-1"><span class="emo">🚨</span><b>何時要立即就醫</b><span>出現這些情況，馬上打電話</span></button>
@@ -421,6 +434,55 @@
     </div>
     <div class="card"><h2>小測驗</h2><div id="quiz-cardio"></div></div>
     <div class="card"><h3>參考資料</h3><ol class="refs" id="refs-cardio"></ol></div>
+  </section>
+
+  <!-- ========== 我的紀錄 ========== -->
+  <section class="view" id="v-log">
+    <div class="disclaimer">紀錄只存在這支手機裡，不會上傳。換手機前請先「匯出備份」。</div>
+    <div class="card" id="logSetupCard">
+      <h2>我的設定</h2>
+      <label class="row"><span>乾體重</span><input type="number" id="setDry" inputmode="decimal" step="0.1" min="25" max="200" placeholder="例 60"> 公斤</label>
+      <p class="muted" style="font-size:17px;margin-top:0">乾體重由醫護人員評估，改變時再更新。</p>
+      <div style="font-weight:700;margin-top:8px">透析日</div>
+      <div class="days" id="setDays"></div>
+      <label class="row"><span>透析時間</span><input type="time" id="setTime" value="08:00" class="timein"></label>
+      <button class="btn primary" id="setSave" style="width:100%">儲存設定</button>
+    </div>
+
+    <div class="card">
+      <h2>記錄今天的體重</h2>
+      <label class="row"><span>體重</span><input type="number" id="recW" inputmode="decimal" step="0.1" min="25" max="220" placeholder="例 61.5"> 公斤</label>
+      <div class="btnrow" style="grid-template-columns:1fr 1fr 1fr" id="recTypes">
+        <button class="btn sel" data-rtype="morning">起床</button>
+        <button class="btn" data-rtype="pre">透析前</button>
+        <button class="btn" data-rtype="post">透析後</button>
+      </div>
+      <button class="btn primary" id="recSave" style="width:100%;margin-top:10px">＋ 記錄</button>
+      <div class="result" id="recResult" hidden></div>
+    </div>
+
+    <div class="card">
+      <h2>最近 14 筆</h2>
+      <div id="logChart"></div>
+      <div id="logList"></div>
+    </div>
+
+    <div class="card">
+      <h2>提醒加入行事曆</h2>
+      <p class="muted" style="font-size:17px">用手機內建的行事曆提醒，不需要網路。</p>
+      <button class="btn" id="icsDialysis" style="width:100%;margin:4px 0">📅 透析日提醒（提前 1 小時）</button>
+      <label class="row"><span>量體重</span><input type="time" id="weighTime" value="07:00" class="timein"></label>
+      <button class="btn" id="icsWeigh" style="width:100%;margin:4px 0">⚖️ 每天量體重提醒</button>
+    </div>
+
+    <div class="card">
+      <h2>備份</h2>
+      <div class="btnrow">
+        <button class="btn" id="exportBtn">⬇ 匯出備份</button>
+        <button class="btn" id="importBtn">⬆ 匯入備份</button>
+      </div>
+      <input type="file" id="importFile" accept="application/json,.json" hidden>
+    </div>
   </section>
 </main>
 <div class="toast" id="toast"></div>
@@ -1327,9 +1389,176 @@ document.querySelectorAll('[data-relief]').forEach(b => b.addEventListener('clic
   $('#crampBadge').textContent = '🟢 ' + RELIEF_TEXT[b.dataset.relief] + '，記得告訴護理人員';
 }));
 
+/* ================= 第三階段：我的紀錄（只存本機） ================= */
+const STORE_KEY = 'hemodialysis.v1';
+const DAY_NAMES = ['日', '一', '二', '三', '四', '五', '六'];
+const ICS_DAYS = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
+const RTYPE = { morning: '起床', pre: '透析前', post: '透析後' };
+function loadStore(){
+  try { const d = JSON.parse(localStorage.getItem(STORE_KEY)); if (d && Array.isArray(d.records)) return d; } catch(e){}
+  return { dry: null, days: [1, 3, 5], time: '08:00', records: [] };
+}
+let store = loadStore();
+function saveStore(){
+  try { localStorage.setItem(STORE_KEY, JSON.stringify(store)); return true; }
+  catch(e){ toast('儲存失敗：手機空間不足或私密瀏覽模式'); return false; }
+}
+navigator.storage?.persist?.().catch(() => {});
+
+const pad2 = n => String(n).padStart(2, '0');
+const dateStr = t => { const d = new Date(t); return `${d.getMonth() + 1}/${d.getDate()}（${DAY_NAMES[d.getDay()]}）${pad2(d.getHours())}:${pad2(d.getMinutes())}`; };
+function gainInfo(w){
+  if (!(store.dry > 0)) return null;
+  const kg = w - store.dry, p = kg / store.dry * 100;
+  return { kg, p, z: zoneOf(Math.max(0, Math.round(p * 10) / 10)) };
+}
+
+function renderSetup(){
+  $('#setDry').value = store.dry ?? '';
+  $('#setTime').value = store.time;
+  $('#setDays').innerHTML = DAY_NAMES.map((n, i) => `<button class="btn day${store.days.includes(i) ? ' sel' : ''}" data-day="${i}">${n}</button>`).join('');
+  $('#setDays').querySelectorAll('[data-day]').forEach(b => b.addEventListener('click', () => b.classList.toggle('sel')));
+}
+$('#setSave').addEventListener('click', () => {
+  const dry = parseFloat($('#setDry').value);
+  if (!(dry >= 25 && dry <= 200)) return toast('請輸入正確的乾體重');
+  store.dry = Math.round(dry * 10) / 10;
+  store.days = [...$('#setDays').querySelectorAll('.sel')].map(b => +b.dataset.day);
+  store.time = $('#setTime').value || '08:00';
+  if (saveStore()){ toast('設定已儲存'); $('#dryW').value = store.dry; renderLog(); }
+});
+
+let recType = 'morning';
+document.querySelectorAll('[data-rtype]').forEach(b => b.addEventListener('click', () => {
+  recType = b.dataset.rtype;
+  document.querySelectorAll('[data-rtype]').forEach(x => x.classList.toggle('sel', x === b));
+}));
+$('#recSave').addEventListener('click', () => {
+  const w = parseFloat($('#recW').value);
+  if (!(w >= 25 && w <= 220)) return toast('請輸入正確的體重');
+  if (!(store.dry > 0)) return toast('請先在上方設定乾體重');
+  store.records.push({ id: Date.now(), t: Date.now(), w: Math.round(w * 10) / 10, type: recType });
+  store.records.sort((a, b) => a.t - b.t);
+  if (!saveStore()) return;
+  const g = gainInfo(w), r = $('#recResult');
+  r.hidden = false; r.className = 'result z-' + g.z;
+  const tip = recType === 'post'
+    ? (Math.abs(g.kg) <= 0.5 ? '透析後接近乾體重 👍' : `透析後與乾體重差 ${g.kg.toFixed(1)} 公斤，如常有不適請告訴醫護人員。`)
+    : { green: '✅ 在安全範圍內', yellow: '⚠️ 已在 3–5% 上限範圍，接下來少喝水、少吃鹹', red: '⛔ 超過乾體重 5%！請控制水分；如果喘、水腫、胸悶，請聯絡透析室' }[g.z];
+  r.innerHTML = `比乾體重多 <span class="num">${g.kg.toFixed(1)}</span> 公斤（${g.p.toFixed(1)}%）<br>${tip}`;
+  $('#recW').value = '';
+  renderLog();
+});
+
+function renderChart(recs){
+  const el = $('#logChart');
+  if (!recs.length || !(store.dry > 0)){ el.innerHTML = '<p class="muted">還沒有紀錄。</p>'; return; }
+  const W = 340, H = 210, L = 44, R = 10, T = 14, B = 30;
+  const d = store.dry, l3 = d * (1 + CONFIG.GAIN_LOW / 100), l5 = d * (1 + CONFIG.GAIN_HIGH / 100);
+  const ws = recs.map(r => r.w);
+  const lo = Math.min(d - 0.5, ...ws) - 0.3, hi = Math.max(l5 + 0.3, ...ws) + 0.3;
+  const X = i => L + (recs.length === 1 ? (W - L - R) / 2 : i * (W - L - R) / (recs.length - 1));
+  const Y = v => T + (hi - v) / (hi - lo) * (H - T - B);
+  const line = (v, c, label, dash) => `<line x1="${L}" x2="${W - R}" y1="${Y(v)}" y2="${Y(v)}" stroke="${c}" stroke-width="1.5" ${dash ? 'stroke-dasharray="5 4"' : ''}/>`
+    + `<text x="${L - 4}" y="${Y(v) + 4}" text-anchor="end" font-size="11" fill="${c}">${label}</text>`;
+  const zc = { green: '#2e8b3d', yellow: '#c98a00', red: '#c62828' };
+  const pts = recs.map((r, i) => `${X(i)},${Y(r.w)}`).join(' ');
+  el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="體重趨勢">
+    <rect x="${L}" y="${Y(hi)}" width="${W - L - R}" height="${Y(l5) - Y(hi)}" fill="#fdecea"/>
+    <rect x="${L}" y="${Y(l5)}" width="${W - L - R}" height="${Y(l3) - Y(l5)}" fill="#fff5d6"/>
+    ${line(d, '#2e8b3d', '乾 ' + d.toFixed(1))}${line(l3, '#c98a00', '+3%', true)}${line(l5, '#c62828', '+5%', true)}
+    <polyline points="${pts}" fill="none" stroke="#0f6e74" stroke-width="2"/>
+    ${recs.map((r, i) => { const g = gainInfo(r.w); return `<circle cx="${X(i)}" cy="${Y(r.w)}" r="${r.type === 'post' ? 4 : 6}" fill="${r.type === 'post' ? '#fff' : zc[g.z]}" stroke="${zc[g.z]}" stroke-width="2.5"/>`; }).join('')}
+    ${recs.map((r, i) => (i % Math.ceil(recs.length / 5) === 0 || i === recs.length - 1) ? `<text x="${X(i)}" y="${H - 10}" text-anchor="middle" font-size="11" fill="#56656a">${new Date(r.t).getMonth() + 1}/${new Date(r.t).getDate()}</text>` : '').join('')}
+  </svg>
+  <p class="muted" style="font-size:15px;margin:0">實心點＝起床或透析前；空心點＝透析後</p>`;
+}
+
+function renderLog(){
+  const recs = store.records.slice(-14);
+  renderChart(recs);
+  $('#logList').innerHTML = recs.slice().reverse().map(r => {
+    const g = gainInfo(r.w);
+    return `<div class="logrow z-${g ? g.z : 'green'}"><div><b>${r.w.toFixed(1)}</b> 公斤 <span class="tag">${RTYPE[r.type]}</span><br>
+      <span class="muted" style="font-size:16px">${dateStr(r.t)}${g ? `｜${g.kg >= 0 ? '+' : ''}${g.kg.toFixed(1)} 公斤（${g.p.toFixed(1)}%）` : ''}</span></div>
+      <button class="del" data-del="${r.id}" aria-label="刪除">✕</button></div>`;
+  }).join('');
+  $('#logList').querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => {
+    if (!confirm('刪除這筆紀錄？')) return;
+    store.records = store.records.filter(r => r.id !== +b.dataset.del); saveStore(); renderLog();
+  }));
+  renderHomeAlert();
+}
+
+function renderHomeAlert(){
+  const el = $('#homeAlert'); if (!el) return;
+  const last = store.records.filter(r => r.type !== 'post').at(-1);
+  const g = last && gainInfo(last.w);
+  if (!g || g.z === 'green'){ el.hidden = true; return; }
+  el.hidden = false; el.className = 'result z-' + g.z;
+  el.innerHTML = g.z === 'red'
+    ? `⛔ 最近一次體重比乾體重多 ${g.kg.toFixed(1)} 公斤（${g.p.toFixed(1)}%），超過 5%！請控制水分。`
+    : `⚠️ 最近一次體重比乾體重多 ${g.kg.toFixed(1)} 公斤（${g.p.toFixed(1)}%），已在上限範圍。`;
+}
+
+/* 行事曆提醒 (.ics) */
+function icsFile(name, ev){
+  const now = new Date(), stamp = now.toISOString().replace(/[-:]/g, '').replace(/\.\d+/, '');
+  const body = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//kftseng2oo1//Hemodialysis//ZH-TW', 'CALSCALE:GREGORIAN',
+    'BEGIN:VEVENT', `UID:${Date.now()}-${Math.random().toString(36).slice(2, 8)}@hemodialysis`, `DTSTAMP:${stamp}`, ...ev, 'END:VEVENT', 'END:VCALENDAR'].join('\r\n');
+  return new File([body], name + '.ics', { type: 'text/calendar' });
+}
+const icsLocal = d => `${d.getFullYear()}${pad2(d.getMonth() + 1)}${pad2(d.getDate())}T${pad2(d.getHours())}${pad2(d.getMinutes())}00`;
+async function deliverFile(file){
+  try { if (navigator.canShare?.({ files: [file] })){ await navigator.share({ files: [file], title: file.name }); return; } }
+  catch(e){ if (e.name === 'AbortError') return; }
+  const url = URL.createObjectURL(file), a = document.createElement('a');
+  a.href = url; a.download = file.name; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 5000);
+}
+$('#icsDialysis').addEventListener('click', () => {
+  if (!store.days.length) return toast('請先在設定選透析日並儲存');
+  const [h, m] = store.time.split(':').map(Number);
+  const d = new Date(); d.setHours(h, m, 0, 0);
+  for (let i = 0; i < 8 && !(store.days.includes(d.getDay()) && d > new Date()); i++) d.setDate(d.getDate() + 1);
+  deliverFile(icsFile('透析提醒', [`DTSTART:${icsLocal(d)}`, 'DURATION:PT4H',
+    `RRULE:FREQ=WEEKLY;BYDAY=${store.days.map(i => ICS_DAYS[i]).join(',')}`,
+    'SUMMARY:血液透析', `DESCRIPTION:記得先量體重；有發燒、咳嗽或不舒服請告訴醫護人員。透析室 ${CONFIG.DIALYSIS_PHONE}`,
+    'BEGIN:VALARM', 'TRIGGER:-PT60M', 'ACTION:DISPLAY', 'DESCRIPTION:一小時後透析', 'END:VALARM']));
+});
+$('#icsWeigh').addEventListener('click', () => {
+  const [h, m] = ($('#weighTime').value || '07:00').split(':').map(Number);
+  const d = new Date(); d.setHours(h, m, 0, 0); if (d <= new Date()) d.setDate(d.getDate() + 1);
+  deliverFile(icsFile('量體重提醒', [`DTSTART:${icsLocal(d)}`, 'DURATION:PT5M', 'RRULE:FREQ=DAILY',
+    'SUMMARY:量體重', 'DESCRIPTION:上完廁所、吃東西前，穿差不多重量的衣服量，並記錄在透析好幫手。',
+    'BEGIN:VALARM', 'TRIGGER:PT0M', 'ACTION:DISPLAY', 'DESCRIPTION:量體重', 'END:VALARM']));
+});
+
+/* 備份 */
+$('#exportBtn').addEventListener('click', () => {
+  const d = new Date();
+  deliverFile(new File([JSON.stringify(store, null, 1)], `透析紀錄備份-${d.getFullYear()}${pad2(d.getMonth() + 1)}${pad2(d.getDate())}.json`, { type: 'application/json' }));
+});
+$('#importBtn').addEventListener('click', () => $('#importFile').click());
+$('#importFile').addEventListener('change', async e => {
+  const f = e.target.files[0]; e.target.value = ''; if (!f) return;
+  try {
+    const d = JSON.parse(await f.text());
+    if (!Array.isArray(d.records)) throw 0;
+    const ids = new Set(store.records.map(r => r.id));
+    const add = d.records.filter(r => r && typeof r.w === 'number' && typeof r.t === 'number' && RTYPE[r.type] && !ids.has(r.id));
+    if (!confirm(`要匯入 ${add.length} 筆新紀錄${d.dry ? `，並把乾體重設為 ${d.dry} 公斤` : ''}嗎？`)) return;
+    store.records = [...store.records, ...add].sort((a, b) => a.t - b.t);
+    if (d.dry > 0) store.dry = d.dry;
+    if (Array.isArray(d.days)) store.days = d.days.filter(n => n >= 0 && n <= 6);
+    if (typeof d.time === 'string') store.time = d.time;
+    saveStore(); renderSetup(); renderLog(); toast('匯入完成');
+  } catch(err){ toast('這不是透析好幫手的備份檔'); }
+});
+
 /* ================= 路由 ================= */
 const VIEWS = { home:'透析好幫手', dry:'乾體重與水分', fistula:'瘻管照護', er:'何時要立即就醫',
-  intro:'認識血液透析', diet:'飲食與用藥', exercise:'運動', cramp:'肌肉抽搐', cardio:'預防心血管疾病' };
+  log:'我的體重紀錄', intro:'認識血液透析', diet:'飲食與用藥', exercise:'運動', cramp:'肌肉抽搐', cardio:'預防心血管疾病' };
 const BUILDERS = { dry:buildDry, fistula:buildFistula, intro:buildIntro, diet:buildDiet, exercise:buildExercise, cramp:buildCramp };
 
 function mountScene(key){
@@ -1365,6 +1594,7 @@ function go(key, push = true){
   if (!VIEWS[key]) key = 'home';
   if (current && current.key !== key){ setListen(false); disposeScene(); }
   if (key !== 'exercise' && exTimer.running) exPause();
+  if (key === 'log'){ renderSetup(); renderLog(); }
   speechSynthesis?.cancel?.();
   document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active', v.id === 'v-'+key));
   $('#title').textContent = VIEWS[key];
@@ -1380,6 +1610,8 @@ window.addEventListener('popstate', e=>go(e.state?.key || location.hash.slice(1)
 /* ================= 初始化 ================= */
 $('#callDialysis').href = 'tel:' + CONFIG.DIALYSIS_PHONE.replace(/[^\d+]/g,'');
 $('#callDialysis').innerHTML = `📞 打給透析室<br><span style="font-size:20px">${CONFIG.DIALYSIS_PHONE}</span>`;
+if (store.dry > 0){ $('#dryW').value = store.dry; $('#nowW').value = (store.dry * 1.02).toFixed(1); }
+renderHomeAlert();
 renderRefs(); ['dry','fistula','intro','diet','exercise','cramp','cardio'].forEach(renderQuiz); updateWater();
 go(location.hash.slice(1) || 'home', false);
 history.replaceState({ key: location.hash.slice(1) || 'home' }, '', location.hash || '#home');
